@@ -16,7 +16,7 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "no-undef": 1,
+        "no-undef": 0,
         "@typescript-eslint/no-var-requires": 0
     }
 }
