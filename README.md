@@ -30,4 +30,4 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 
-[ISC](LICENSE) © 2021 Mephysics <mephysicz@mephysics.live>
+[ISC](LICENSE) © 2021 Muunatic <mephysicz@mephysics.live>
