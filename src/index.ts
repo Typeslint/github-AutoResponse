@@ -1,5 +1,6 @@
 import { Probot } from "probot";
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export = (app: Probot) => {
 
   app.on("issues.opened", async (context) => {
