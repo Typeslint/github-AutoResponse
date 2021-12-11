@@ -4,7 +4,7 @@ import { Probot } from "probot";
 export = (app: Probot) => {
 
   app.on("issues.opened", async (context) => {
-    if (context.payload.sender.login === 'Mephysics') return
+    if (context.payload.sender.login === 'Muunatic') return
     const username = context.payload.sender.login;
     const issueComment = context.issue({
       body: `Hello @${username} Thank you for submitting Issues, please wait for next notification after we review your Issues.`,
@@ -34,12 +34,12 @@ export = (app: Probot) => {
         name: 'pending'
       })
     )
-    if (context.payload.sender.login === 'Mephysics') return
+    if (context.payload.sender.login === 'Muunatic') return
     await context.octokit.issues.createComment(issueClosed)
   });
 
   app.on("pull_request.opened", async (context) => {
-    if (context.payload.sender.login === 'Mephysics') return
+    if (context.payload.sender.login === 'Muunatic') return
     const username = context.payload.sender.login
     const propened = context.issue({
       body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
@@ -65,7 +65,7 @@ export = (app: Probot) => {
   });
 
   app.on("pull_request.closed", async (context) => {
-    if (context.payload.sender.login === 'Mephysics') return
+    if (context.payload.sender.login === 'Muunatic') return
     const username = context.payload.sender.login
     const prClosed = context.issue({
       body: `Pull request ditutup oleh @${username}.`
@@ -83,6 +83,5 @@ export = (app: Probot) => {
       })
     )
   });
-
 
 };
