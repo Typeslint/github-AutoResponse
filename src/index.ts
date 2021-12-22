@@ -51,17 +51,6 @@ export = (app: Probot) => {
         labels: ['pending']
       })
     )
-    if (context.payload.pull_request.state === 'failure') { 
-      const Failedcomment = context.issue({
-        body: `@${username} CI Failed, Please fix code before merge.`
-      })
-      await context.octokit.issues.createComment(Failedcomment)
-      await context.octokit.issues.addLabels(
-        context.issue({
-          labels: ['CI Failed']
-        })
-      )
-    }
   });
 
   app.on("pull_request.closed", async (context) => {
