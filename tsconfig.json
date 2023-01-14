@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "module": "commonjs",
     "target": "ES2021",
     "outDir": "dist",
@@ -10,25 +9,16 @@
     "alwaysStrict": true,
     "allowJs": true,
     "checkJs": true,
-    "sourceMap": false,
-    "declaration": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
     "noImplicitThis": true,
-    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "pretty": false,
-    "skipLibCheck": true
+    "strictFunctionTypes": true,
+    "strictNullChecks": true
   },
   "include": [
-    "./src"
+    "src/"
   ],
   "exclude": [
     "node_modules"
