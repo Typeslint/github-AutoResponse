@@ -8,7 +8,6 @@
     ],
     "alwaysStrict": true,
     "allowJs": true,
-    "checkJs": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
