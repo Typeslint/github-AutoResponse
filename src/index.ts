@@ -1,4 +1,6 @@
 import { Probot } from "probot";
+require("dotenv").config();
+require("./structures/listener");
 
 module.exports = (app: Probot) => {
 
@@ -61,6 +63,7 @@ module.exports = (app: Probot) => {
     app.on("pull_request_review.submitted", async (context) => {
         if (context.payload.sender.type == "User") {
             if (context.payload.sender.login == context.payload.repository.owner.login) {
+                // Owner
                 if (context.payload.review.state == "approved") {
                     await context.octokit.pulls.createReview({
                         repo: context.payload.repository.name,
@@ -69,7 +72,7 @@ module.exports = (app: Probot) => {
                         body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, please type \`Ready to merge\` for merging`,
                         event: "COMMENT"
                     });
-                    if (context.payload.pull_request.labels.map(a => a.name == "Requested Changes")) {
+                    if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                         await context.octokit.issues.removeLabel(
                             context.issue({
                                 name: 'Requested Changes'
@@ -108,13 +111,25 @@ module.exports = (app: Probot) => {
                         body: `@${context.payload.pull_request.user.login} your pull request has requested changes by @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
                         event: "COMMENT",
                     });
-                    if (context.payload.pull_request.labels.map(a => a.name == "Others Approved")) {
+                    if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                         await context.octokit.issues.removeLabel(
                             context.issue({
-                                name: 'Others Approved'
+                                name: 'Approved'
                             })
                         );
                         console.log('Label removed');
+                        await context.octokit.issues.addLabels(
+                            context.issue({
+                                labels: ['Requested Changes']
+                            })
+                        );
+                        console.log('PRs Requested Changes');
+                        await context.octokit.issues.removeLabel(
+                            context.issue({
+                                name: 'Pending'
+                            })
+                        );
+                    } else {
                         await context.octokit.issues.addLabels(
                             context.issue({
                                 labels: ['Requested Changes']
@@ -137,7 +152,7 @@ module.exports = (app: Probot) => {
                         body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, even though please wait for the \`CODEOWNERS\` to review`,
                         event: "COMMENT"
                     });
-                    if (context.payload.pull_request.labels.map(a => a.name == "Requested Changes")) {
+                    if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                         await context.octokit.issues.removeLabel(
                             context.issue({
                                 name: 'Requested Changes'
@@ -194,35 +209,77 @@ module.exports = (app: Probot) => {
         }
     });
 
-    // Rerun Workflows
+    // re-requested reviewer
     app.on("pull_request.synchronize", async (context) => {
         if (context.payload.pull_request.user.type == "User") {
-            await context.octokit.checks.listForRef({
+            context.octokit.issues.listLabelsOnIssue({
                 owner: context.payload.repository.owner.login,
                 repo: context.payload.repository.name,
-                ref: context.payload.pull_request.head.sha
+                issue_number: context.payload.pull_request.number
             }).then(async (res) => {
-                await context.octokit.actions.reRunWorkflowFailedJobs({
-                    owner: context.payload.repository.owner.login,
-                    repo: context.payload.repository.name,
-                    run_id: res.data.check_runs[0].id
-                });
-                await context.octokit.pulls.listRequestedReviewers({
-                    owner: context.payload.repository.owner.login,
-                    repo: context.payload.repository.name,
-                    pull_number: context.payload.pull_request.number,
-                }).then(async (res) => {
-                    let i: number;
-                    for (i = 0; i < res.data.users.length; i++) {
-                        const username: string = res.data.users[i].login
-                        context.octokit.pulls.requestReviewers({
+                let i: number;
+                if (res.data.find(a => a.name == "Requested Changes")) {
+                    await context.octokit.pulls.listReviews({
+                        owner: context.payload.repository.owner.login,
+                        repo: context.payload.repository.name,
+                        pull_number: context.payload.pull_request.number,
+                    }).then(async (res) => {
+                        const reviewersArray: string[] = [];
+                        const tagReviewers: string[] = [];
+                        for (i = 0; i < res.data.length; i++) {
+                            if (res.data[i].user.type == "User") {
+                                const datastate: string[] = [
+                                    "CHANGES_REQUESTED",
+                                    "APPROVED"
+                                ];
+                                if (res.data[i].state == datastate.find(a => a == res.data[i].state)) { 
+                                    if (res.data[i].user.login != reviewersArray.find(a => a == res.data[i].user.login)) {
+                                        const username: string = res.data[i].user.login;
+                                        reviewersArray.push(username);
+                                        tagReviewers.push("@" + username);
+                                        await context.octokit.pulls.requestReviewers({
+                                            owner: context.payload.repository.owner.login,
+                                            repo: context.payload.repository.name,
+                                            pull_number: context.payload.pull_request.number,
+                                            reviewers: [username]
+                                        });
+                                    } else {
+                                        continue;
+                                    }
+                                } else {
+                                    continue;
+                                }
+                            } else {
+                                continue;
+                            }
+                        }
+                        await context.octokit.issues.createComment(
+                            context.issue({
+                                owner: context.payload.repository.owner.login,
+                                repo: context.payload.repository.name,
+                                issue_number: context.payload.pull_request.number,
+                                body: `PING! ${tagReviewers.join(", ")}. The author has pushed new commits since your last review. please review @${context.payload.sender.login} new commit before merge, thanks!`
+                            })
+                        );
+                        context.octokit.issues.listLabelsOnIssue({
                             owner: context.payload.repository.owner.login,
                             repo: context.payload.repository.name,
-                            pull_number: context.payload.pull_request.number,
-                            reviewers: [username]
-                        })
-                    }
-                });
+                            issue_number: context.payload.pull_request.number,
+                        }).then(async (res) => {
+                            if (res.data.find(a => a.name == "Requested Changes")) {
+                                context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Requested Changes'
+                                    })
+                                );
+                            } else {
+                                return;
+                            }
+                        });
+                    });
+                } else if (res.data.find(a => a.name == "Approved")) {
+                    return;
+                }
             });
         } else {
             return;
@@ -234,12 +291,12 @@ module.exports = (app: Probot) => {
         if (context.payload.workflow_run.event == "pull_request") {
             if (context.payload.sender.type == "User") {
                 if (context.payload.workflow_run.conclusion == "success") {
-                    context.octokit.issues.listLabelsOnIssue({
+                    context.octokit.pulls.get({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
-                        issue_number: context.payload.workflow_run.pull_requests[0].number,
+                        pull_number: context.payload.workflow_run.pull_requests[0].number,
                     }).then(async (res) => {
-                        if (res.data.map(a => a.name == "CI Failed")) {
+                        if (res.data.labels.find(a => a.name == "CI Failed")) {
                             await context.octokit.issues.removeLabel(
                                 context.issue({
                                     owner: context.payload.repository.owner.login,
@@ -250,7 +307,7 @@ module.exports = (app: Probot) => {
                             );
                             console.log('CI Passed!');
                         } else {
-                            console.log('CI Passed!');
+                            return;
                         }
                     })
                 } else if (context.payload.workflow_run.conclusion == "failure") {
@@ -338,6 +395,26 @@ module.exports = (app: Probot) => {
                             continue;
                         }
                     }
+                } else {
+                    return;
+                }
+            }
+
+            if (context.payload.comment.body.toLowerCase() == "merge") {
+                if (context.payload.sender.login == context.payload.repository.owner.login) {
+                    await context.octokit.pulls.merge({
+                        repo: context.payload.repository.name,
+                        owner: context.payload.repository.owner.login,
+                        pull_number: context.payload.issue.number,
+                        commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
+                        commit_message: context.payload.issue.title
+                    });
+                    console.log("Merged!");
+                    await context.octokit.issues.createComment(
+                        context.issue({
+                            body: `Merged by ${context.payload.comment.user.login}!`
+                        })
+                    );
                 } else {
                     return;
                 }
