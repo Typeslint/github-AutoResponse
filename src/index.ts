@@ -144,6 +144,7 @@ module.exports = (app: Probot) => {
                     }
                 }
             } else {
+                // Others Approved
                 if (context.payload.review.state == "approved") {
                     await context.octokit.pulls.createReview({
                         repo: context.payload.repository.name,
@@ -173,7 +174,7 @@ module.exports = (app: Probot) => {
                     } else {
                         await context.octokit.issues.addLabels(
                             context.issue({
-                                labels: ['Approved']
+                                labels: ['Others Approved']
                             })
                         );
                         console.log('PRs Approved');
@@ -222,7 +223,7 @@ module.exports = (app: Probot) => {
                     await context.octokit.pulls.listReviews({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
-                        pull_number: context.payload.pull_request.number,
+                        pull_number: context.payload.pull_request.number
                     }).then(async (res) => {
                         const reviewersArray: string[] = [];
                         const tagReviewers: string[] = [];
@@ -264,7 +265,7 @@ module.exports = (app: Probot) => {
                         context.octokit.issues.listLabelsOnIssue({
                             owner: context.payload.repository.owner.login,
                             repo: context.payload.repository.name,
-                            issue_number: context.payload.pull_request.number,
+                            issue_number: context.payload.pull_request.number
                         }).then(async (res) => {
                             if (res.data.find(a => a.name == "Requested Changes")) {
                                 context.octokit.issues.removeLabel(
@@ -294,7 +295,7 @@ module.exports = (app: Probot) => {
                     context.octokit.pulls.get({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
-                        pull_number: context.payload.workflow_run.pull_requests[0].number,
+                        pull_number: context.payload.workflow_run.pull_requests[0].number
                     }).then(async (res) => {
                         if (res.data.labels.find(a => a.name == "CI Failed")) {
                             await context.octokit.issues.removeLabel(
@@ -309,7 +310,7 @@ module.exports = (app: Probot) => {
                         } else {
                             return;
                         }
-                    })
+                    });
                 } else if (context.payload.workflow_run.conclusion == "failure") {
                     console.log('CI Failure!');
                     await context.octokit.issues.addLabels(
