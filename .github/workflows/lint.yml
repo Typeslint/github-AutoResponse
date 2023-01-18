@@ -1,0 +1,26 @@
+name: eslint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [16.19.0]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: install npm
+      run: npm install npm@8.19.3 -g
+    - name: install dependencies
+      run: npm ci
+    - name: run lint
+      run: npm test
