@@ -1,4 +1,7 @@
 import { Probot } from "probot";
+import fetch from "node-fetch";
+import { token } from "./data/config";
+import { GetCommit } from "./structures/interface";
 require("dotenv").config();
 require("./structures/listener");
 
@@ -9,12 +12,12 @@ module.exports = (app: Probot) => {
         if (context.payload.sender.login === 'Muunatic') return;
         const username = context.payload.sender.login;
         const issueComment = context.issue({
-            body: `Hello @${username} Thank you for submitting Issues, please wait for next notification after we review your Issues.`,
+            body: `Hello @${username} Thank you for submitting Issues, please wait for next notification after we review your Issues.`
         });
         console.log('Issues created');
         await context.octokit.issues.addLabels(
             context.issue({
-                labels: ['pending']
+                labels: ['Pending']
             })
         );
         await context.octokit.issues.createComment(issueComment);
@@ -26,7 +29,7 @@ module.exports = (app: Probot) => {
         const issueClosed = context.issue({
             body: `Issue closed by @${username}.`
         });
-        console.log('Issues closed')
+        console.log('Issues closed');
         await context.octokit.issues.addLabels(
             context.issue({
                 labels: ['closed']
@@ -34,7 +37,7 @@ module.exports = (app: Probot) => {
         );
         await context.octokit.issues.removeLabel(
             context.issue({
-                name: 'pending'
+                name: 'Pending'
             })
         );
         await context.octokit.issues.createComment(issueClosed);
@@ -43,17 +46,54 @@ module.exports = (app: Probot) => {
     // Pull request openened
     app.on("pull_request.opened", async (context) => {
         if (context.payload.sender.type == "User") {
-            const username = context.payload.sender.login;
-            const propened = context.issue({
-                body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
-            });
-            console.log('Pull request opened');
-            await context.octokit.issues.createComment(propened)
-            await context.octokit.issues.addLabels(
-                context.issue({
-                    labels: ['pending']
-                })
-            );
+            if (context.payload.repository.html_url == "https://github.com/Muunatic/github-AutoResponse") {
+                let commitSHA: string;
+                let commitFileName: string;
+                await context.octokit.pulls.listCommits({
+                    owner: 'Muunatic',
+                    repo: 'github-AutoResponse',
+                    pull_number: context.payload.number
+                }).then((res) => {
+                    return commitSHA = res.data[0].sha;
+                });
+                await fetch(`https://api.github.com/repos/Muunatic/github-AutoResponse/pulls/commits/${commitSHA}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then((res) => {
+                    return res.json();
+                }).then((data: GetCommit) => {
+                    return commitFileName = data.files[0].filename;
+                });
+                if (commitFileName == "src/index.ts") {
+                    const username = context.payload.sender.login;
+                    const propened = context.issue({
+                        body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+                    });
+                    console.log('Pull request opened');
+                    await context.octokit.issues.createComment(propened);
+                    await context.octokit.issues.addLabels(
+                        context.issue({
+                            labels: ['Pending', 'Core']
+                        })
+                    );
+                }
+            } else {
+                const username = context.payload.sender.login;
+                const propened = context.issue({
+                    body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+                });
+                console.log('Pull request opened');
+                await context.octokit.issues.createComment(propened);
+                await context.octokit.issues.addLabels(
+                    context.issue({
+                        labels: ['Pending']
+                    })
+                );
+            }
         } else {
             return;
         }
@@ -111,7 +151,7 @@ module.exports = (app: Probot) => {
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
                                 body: ``,
-                                event: "COMMENT",
+                                event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                                 await context.octokit.issues.removeLabel(
@@ -192,7 +232,7 @@ module.exports = (app: Probot) => {
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
                                 body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I'm merging this PR, thanks!`,
-                                event: "COMMENT",
+                                event: "COMMENT"
                             });
                             await context.octokit.issues.addLabels(
                                 context.issue({
@@ -256,7 +296,7 @@ module.exports = (app: Probot) => {
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
                                 body: `@${context.payload.pull_request.user.login} your pull request has requested changes by @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
-                                event: "COMMENT",
+                                event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                                 await context.octokit.issues.removeLabel(
@@ -337,7 +377,7 @@ module.exports = (app: Probot) => {
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
                                 body: `@${context.payload.pull_request.user.login} your pull request has requested changes by repository contributor @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
-                                event: "COMMENT",
+                                event: "COMMENT"
                             });
                             await context.octokit.issues.addLabels(
                                 context.issue({
@@ -352,7 +392,7 @@ module.exports = (app: Probot) => {
                             );
                         }
                     }
-                    break
+                    break;
                 default:
                     return;
             }
@@ -384,7 +424,7 @@ module.exports = (app: Probot) => {
                                     "CHANGES_REQUESTED",
                                     "APPROVED"
                                 ];
-                                if (res.data[i].state == datastate.find(a => a == res.data[i].state)) { 
+                                if (res.data[i].state == datastate.find(a => a == res.data[i].state)) {
                                     if (res.data[i].user.login != reviewersArray.find(a => a == res.data[i].user.login)) {
                                         const username: string = res.data[i].user.login;
                                         reviewersArray.push(username);
@@ -631,7 +671,7 @@ module.exports = (app: Probot) => {
                                 return;
                             }
                         }
-                    break
+                    break;
                 default:
                     break;
             }
