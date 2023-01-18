@@ -42,9 +42,7 @@ module.exports = (app: Probot) => {
 
     // Pull request openened
     app.on("pull_request.opened", async (context) => {
-        if (context.payload.sender.type == "Bot") {
-            return;
-        } else {
+        if (context.payload.sender.type == "User") {
             const username = context.payload.sender.login;
             const propened = context.issue({
                 body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
@@ -56,154 +54,307 @@ module.exports = (app: Probot) => {
                     labels: ['pending']
                 })
             );
+        } else {
+            return;
         }
     });
 
     // Pull request comment
     app.on("pull_request_review.submitted", async (context) => {
         if (context.payload.sender.type == "User") {
-            if (context.payload.sender.login == context.payload.repository.owner.login) {
-                // Owner
-                if (context.payload.review.state == "approved") {
-                    await context.octokit.pulls.createReview({
-                        repo: context.payload.repository.name,
-                        owner: context.payload.repository.owner.login,
-                        pull_number: context.payload.pull_request.number,
-                        body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, please type \`Ready to merge\` for merging`,
-                        event: "COMMENT"
-                    });
-                    if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Requested Changes'
-                            })
-                        );
-                        console.log('Label removed');
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Approved']
-                            })
-                        );
-                        console.log('PRs Approved');
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Pending'
-                            })
-                        );
+            switch (context.payload.pull_request.user.type) {
+                case "User":
+                    if (context.payload.sender.login == context.payload.repository.owner.login) {
+                        // Owner
+                        if (context.payload.review.state == "approved") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, please type \`Ready to merge\` for merging`,
+                                event: "COMMENT"
+                            });
+                            if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Requested Changes'
+                                    })
+                                );
+                                console.log('Label removed');
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            } else {
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            }
+                        } else if (context.payload.review.state == "changes_requested") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: ``,
+                                event: "COMMENT",
+                            });
+                            if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Approved'
+                                    })
+                                );
+                                console.log('Label removed');
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Requested Changes']
+                                    })
+                                );
+                                console.log('PRs Requested Changes');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            } else {
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Requested Changes']
+                                    })
+                                );
+                                console.log('PRs Requested Changes');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            }
+                        }
                     } else {
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Approved']
-                            })
-                        );
-                        console.log('PRs Approved');
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Pending'
-                            })
-                        );
+                        // Others Approved
+                        if (context.payload.review.state == "approved") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, even though please wait for the \`CODEOWNERS\` to review`,
+                                event: "COMMENT"
+                            });
+                            if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Requested Changes'
+                                    })
+                                );
+                                console.log('Label removed');
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Others Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            } else {
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Others Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            }
+                        } else if (context.payload.review.state == "changes_requested") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I'm merging this PR, thanks!`,
+                                event: "COMMENT",
+                            });
+                            await context.octokit.issues.addLabels(
+                                context.issue({
+                                    labels: ['Requested Changes']
+                                })
+                            );
+                            console.log('PRs Requested Changes');
+                            await context.octokit.issues.removeLabel(
+                                context.issue({
+                                    name: 'Pending'
+                                })
+                            );
+                        }
                     }
-                } else if (context.payload.review.state == "changes_requested") {
-                    await context.octokit.pulls.createReview({
-                        repo: context.payload.repository.name,
-                        owner: context.payload.repository.owner.login,
-                        pull_number: context.payload.pull_request.number,
-                        body: `@${context.payload.pull_request.user.login} your pull request has requested changes by @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
-                        event: "COMMENT",
-                    });
-                    if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Approved'
-                            })
-                        );
-                        console.log('Label removed');
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Requested Changes']
-                            })
-                        );
-                        console.log('PRs Requested Changes');
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Pending'
-                            })
-                        );
+                    break;
+                case "Bot":
+                    if (context.payload.sender.login == context.payload.repository.owner.login) {
+                        // Owner
+                        if (context.payload.review.state == "approved") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `@${context.payload.pull_request.user.login} Pull request has been approved by @${context.payload.review.user.login}, please type \`Merge\` for merging @${context.payload.review.user.login}`,
+                                event: "COMMENT"
+                            });
+                            if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Requested Changes'
+                                    })
+                                );
+                                console.log('Label removed');
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            } else {
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            }
+                        } else if (context.payload.review.state == "changes_requested") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `@${context.payload.pull_request.user.login} your pull request has requested changes by @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
+                                event: "COMMENT",
+                            });
+                            if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Approved'
+                                    })
+                                );
+                                console.log('Label removed');
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Requested Changes']
+                                    })
+                                );
+                                console.log('PRs Requested Changes');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            } else {
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Requested Changes']
+                                    })
+                                );
+                                console.log('PRs Requested Changes');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            }
+                        }
                     } else {
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Requested Changes']
-                            })
-                        );
-                        console.log('PRs Requested Changes');
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Pending'
-                            })
-                        );
+                        // Others Approved
+                        if (context.payload.review.state == "approved") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, even though please wait for the \`CODEOWNERS\` to review`,
+                                event: "COMMENT"
+                            });
+                            if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Requested Changes'
+                                    })
+                                );
+                                console.log('Label removed');
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Others Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            } else {
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Others Approved']
+                                    })
+                                );
+                                console.log('PRs Approved');
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
+                            }
+                        } else if (context.payload.review.state == "changes_requested") {
+                            await context.octokit.pulls.createReview({
+                                repo: context.payload.repository.name,
+                                owner: context.payload.repository.owner.login,
+                                pull_number: context.payload.pull_request.number,
+                                body: `@${context.payload.pull_request.user.login} your pull request has requested changes by repository contributor @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
+                                event: "COMMENT",
+                            });
+                            await context.octokit.issues.addLabels(
+                                context.issue({
+                                    labels: ['Requested Changes']
+                                })
+                            );
+                            console.log('PRs Requested Changes');
+                            await context.octokit.issues.removeLabel(
+                                context.issue({
+                                    name: 'Pending'
+                                })
+                            );
+                        }
                     }
-                }
-            } else {
-                // Others Approved
-                if (context.payload.review.state == "approved") {
-                    await context.octokit.pulls.createReview({
-                        repo: context.payload.repository.name,
-                        owner: context.payload.repository.owner.login,
-                        pull_number: context.payload.pull_request.number,
-                        body: `@${context.payload.pull_request.user.login} your pull request has been approved by @${context.payload.review.user.login}, even though please wait for the \`CODEOWNERS\` to review`,
-                        event: "COMMENT"
-                    });
-                    if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Requested Changes'
-                            })
-                        );
-                        console.log('Label removed');
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Others Approved']
-                            })
-                        );
-                        console.log('PRs Approved');
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Pending'
-                            })
-                        );
-                    } else {
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Others Approved']
-                            })
-                        );
-                        console.log('PRs Approved');
-                        await context.octokit.issues.removeLabel(
-                            context.issue({
-                                name: 'Pending'
-                            })
-                        );
-                    }
-                } else if (context.payload.review.state == "changes_requested") {
-                    await context.octokit.pulls.createReview({
-                        repo: context.payload.repository.name,
-                        owner: context.payload.repository.owner.login,
-                        pull_number: context.payload.pull_request.number,
-                        body: `@${context.payload.pull_request.user.login} your pull request has requested changes by repository contributor @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
-                        event: "COMMENT",
-                    });
-                    await context.octokit.issues.addLabels(
-                        context.issue({
-                            labels: ['Requested Changes']
-                        })
-                    );
-                    console.log('PRs Requested Changes');
-                    await context.octokit.issues.removeLabel(
-                        context.issue({
-                            name: 'Pending'
-                        })
-                    );
-                }
+                    break
+                default:
+                    return;
             }
         } else {
             return;
@@ -359,66 +510,130 @@ module.exports = (app: Probot) => {
         }
     });
 
-
     // Comment created
     app.on("issue_comment.created", async (context) => {
         if (context.payload.comment.user.type == "User") {
-            // Merge pull request
-            if (context.payload.comment.body.toLowerCase() == "ready to merge") {
-                if (context.payload.issue.user.login == context.payload.comment.user.login) {
-                    let i: number;
-                    for (i = 0; i < context.payload.issue.labels.length; i++) {
-                        if (context.payload.issue.labels[i].name == "Approved") {
-                            console.log("Merging");
-                            await context.octokit.pulls.merge({
-                                repo: context.payload.repository.name,
-                                owner: context.payload.repository.owner.login,
-                                pull_number: context.payload.issue.number,
-                                commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
-                                commit_message: context.payload.issue.title
-                            });
-                            console.log("Merged!");
-                            await context.octokit.issues.createComment(
-                                context.issue({
-                                    body: `Merged by ${context.payload.comment.user.login}!`
-                                })
-                            );
-                            break;
-                        } else if (context.payload.issue.labels[i].name == "Requested Changes") {
-                            console.log('PRs Blocked');
-                            await context.octokit.issues.createComment(
-                                context.issue({
-                                    body: `Merging blocked because PRs has requested changes! @${context.payload.comment.user.login}`
-                                })
-                            );
-                            break;
-                        } else {
-                            continue;
+            switch (context.payload.issue.user.type) {
+                case "User":
+                        // Merge pull request
+                        if (context.payload.comment.body.toLowerCase() == "ready to merge") {
+                            if (context.payload.issue.user.login == context.payload.comment.user.login) {
+                                let i: number;
+                                for (i = 0; i < context.payload.issue.labels.length; i++) {
+                                    if (context.payload.issue.labels[i].name == "Approved") {
+                                        console.log("Merging");
+                                        await context.octokit.pulls.merge({
+                                            repo: context.payload.repository.name,
+                                            owner: context.payload.repository.owner.login,
+                                            pull_number: context.payload.issue.number,
+                                            commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
+                                            commit_message: context.payload.issue.title
+                                        });
+                                        console.log("Merged!");
+                                        await context.octokit.issues.createComment(
+                                            context.issue({
+                                                body: `Merged by ${context.payload.comment.user.login}!`
+                                            })
+                                        );
+                                        break;
+                                    } else if (context.payload.issue.labels[i].name == "Requested Changes") {
+                                        console.log('PRs Blocked');
+                                        await context.octokit.issues.createComment(
+                                            context.issue({
+                                                body: `Merging blocked because PRs has requested changes! @${context.payload.comment.user.login}`
+                                            })
+                                        );
+                                        break;
+                                    } else {
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                return;
+                            }
                         }
-                    }
-                } else {
-                    return;
-                }
-            }
 
-            if (context.payload.comment.body.toLowerCase() == "merge") {
-                if (context.payload.sender.login == context.payload.repository.owner.login) {
-                    await context.octokit.pulls.merge({
-                        repo: context.payload.repository.name,
-                        owner: context.payload.repository.owner.login,
-                        pull_number: context.payload.issue.number,
-                        commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
-                        commit_message: context.payload.issue.title
-                    });
-                    console.log("Merged!");
-                    await context.octokit.issues.createComment(
-                        context.issue({
-                            body: `Merged by ${context.payload.comment.user.login}!`
-                        })
-                    );
-                } else {
-                    return;
-                }
+                        if (context.payload.comment.body.toLowerCase() == "merge") {
+                            if (context.payload.sender.login == context.payload.repository.owner.login) {
+                                await context.octokit.pulls.merge({
+                                    repo: context.payload.repository.name,
+                                    owner: context.payload.repository.owner.login,
+                                    pull_number: context.payload.issue.number,
+                                    commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
+                                    commit_message: context.payload.issue.title
+                                });
+                                console.log("Merged!");
+                                await context.octokit.issues.createComment(
+                                    context.issue({
+                                        body: `Merged by ${context.payload.comment.user.login}!`
+                                    })
+                                );
+                            } else {
+                                return;
+                            }
+                        }
+                    break;
+                case "Bot":
+                        // Merge pull request
+                        if (context.payload.comment.body.toLowerCase() == "ready to merge") {
+                            if (context.payload.issue.user.login == context.payload.comment.user.login) {
+                                let i: number;
+                                for (i = 0; i < context.payload.issue.labels.length; i++) {
+                                    if (context.payload.issue.labels[i].name == "Approved") {
+                                        console.log("Merging");
+                                        await context.octokit.pulls.merge({
+                                            repo: context.payload.repository.name,
+                                            owner: context.payload.repository.owner.login,
+                                            pull_number: context.payload.issue.number,
+                                            commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
+                                            commit_message: context.payload.issue.title
+                                        });
+                                        console.log("Merged!");
+                                        await context.octokit.issues.createComment(
+                                            context.issue({
+                                                body: `Merged by ${context.payload.comment.user.login}!`
+                                            })
+                                        );
+                                        break;
+                                    } else if (context.payload.issue.labels[i].name == "Requested Changes") {
+                                        console.log('PRs Blocked');
+                                        await context.octokit.issues.createComment(
+                                            context.issue({
+                                                body: `Merging blocked because PRs has requested changes! @${context.payload.comment.user.login}`
+                                            })
+                                        );
+                                        break;
+                                    } else {
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                return;
+                            }
+                        }
+
+                        if (context.payload.comment.body.toLowerCase() == "merge") {
+                            if (context.payload.sender.login == context.payload.repository.owner.login) {
+                                await context.octokit.pulls.merge({
+                                    repo: context.payload.repository.name,
+                                    owner: context.payload.repository.owner.login,
+                                    pull_number: context.payload.issue.number,
+                                    commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
+                                    commit_message: context.payload.issue.title
+                                });
+                                console.log("Merged!");
+                                await context.octokit.issues.createComment(
+                                    context.issue({
+                                        body: `Merged by ${context.payload.comment.user.login}!`
+                                    })
+                                );
+                            } else {
+                                return;
+                            }
+                        }
+                    break
+                default:
+                    break;
             }
         } else {
             return;
