@@ -4,17 +4,27 @@
     "target": "ES2021",
     "outDir": "dist",
     "lib": [
-      "ES2021"
+      "ES2021",
+      "dom"
     ],
     "alwaysStrict": true,
     "allowJs": true,
-    "esModuleInterop": true,
-    "noImplicitAny": true,
+    "sourceMap": false,
+    "declaration": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "noImplicitAny": false,
     "noImplicitThis": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "pretty": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/"
