@@ -1,6 +1,6 @@
 {
-  "name": "typescript-probot",
-  "version": "2.1.0",
+  "name": "typeslint-cli",
+  "version": "2.2.0",
   "private": true,
   "description": "Probot Framework",
   "author": "Muunatic",
@@ -9,8 +9,7 @@
     "build": "tsc",
     "start": "probot run ./dist/index.js",
     "lint:fix": "eslint . --fix",
-    "test": "eslint .",
-    "version": "echo 2.0.1"
+    "test": "eslint ."
   },
   "dependencies": {
     "@octokit/rest": "^19.0.5",
