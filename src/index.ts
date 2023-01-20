@@ -1,11 +1,81 @@
-import { Probot } from "probot";
 import fetch from "node-fetch";
+import { Probot } from "probot";
 import { token } from "./data/config";
-import { GetCommit } from "./structures/interface";
+import { getUserData, getEvent } from "./structures/interface";
 require("dotenv").config();
 require("./structures/listener");
 
 module.exports = (app: Probot) => {
+
+    // Update readme profile
+    app.on("push", async (context) => {
+        let event1: string;
+        let event2: string;
+        let event3: string;
+        let event4: string;
+        let event5: string;
+        async function userActivity() {
+            const arrayActivity: getUserData = {"userData": []};
+            await fetch('https://api.github.com/users/Muunatic/events/public', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then((res) => {
+                return res.json();
+            }).then((res: [getEvent]) => {
+                let i: number;
+                for (i = 0; i < res.length; i++) {
+                    if (res[i].type == "PushEvent") {
+                        if (arrayActivity.userData.length < 5) {
+                            arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](https://github.com/${res[i].repo.url}/commit/${res[i].payload.head}) in [${res[i].repo.name}](${res[i].repo.url})`});
+                        } else {
+                            break;
+                        }
+                    } else if (res[i].type == "PullRequestEvent") {
+                        if (arrayActivity.userData.length < 5) {
+                            arrayActivity.userData.push({event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](${res[i].payload.pull_request.url}) in [${res[i].repo.name}](${res[i].repo.url})`});
+                        } else {
+                            break;
+                        }
+                    } else {
+                        continue;
+                    }
+                }
+                event1 = arrayActivity.userData[0].event;
+                event2 = arrayActivity.userData[1].event;
+                event3 = arrayActivity.userData[2].event;
+                event4 = arrayActivity.userData[3].event;
+                event5 = arrayActivity.userData[4].event;
+                return;
+            });
+        }
+        if (context.payload.repository.owner.login == "Muunatic") {
+            if (context.payload.sender.login == "Muunatic") {
+                await userActivity();
+                await context.octokit.repos.getContent({
+                    owner: "Muunatic",
+                    repo: "Muunatic",
+                    path: "README.MD",
+                    ref: "main"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                }).then(async (res: any) => {
+                    const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \n Updated at ${new Date().toUTCString()} \n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
+                    await context.octokit.repos.createOrUpdateFileContents({
+                        content: Buffer.from(textcontent, "utf-8").toString("base64"),
+                        path: "README.md",
+                        message: "Update Activities ✔️",
+                        owner: "Muunatic",
+                        repo: "Muunatic",
+                        branch: "main",
+                        sha: res.data.sha
+                    });
+                });
+            }
+        }
+    });
 
     // Issues opened
     app.on("issues.opened", async (context) => {
@@ -47,40 +117,29 @@ module.exports = (app: Probot) => {
     app.on("pull_request.opened", async (context) => {
         if (context.payload.sender.type == "User") {
             if (context.payload.repository.html_url == "https://github.com/Muunatic/github-AutoResponse") {
-                let commitSHA: string;
-                let commitFileName: string;
-                await context.octokit.pulls.listCommits({
+                await context.octokit.pulls.listFiles({
                     owner: 'Muunatic',
                     repo: 'github-AutoResponse',
                     pull_number: context.payload.number
                 }).then((res) => {
-                    return commitSHA = res.data[0].sha;
-                });
-                await fetch(`https://api.github.com/repos/Muunatic/github-AutoResponse/pulls/commits/${commitSHA}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                    return res.data;
+                }).then(async (data) => {
+                    if (data.find(a => a.filename == "src/index.ts")) {
+                        const username = context.payload.sender.login;
+                        const propened = context.issue({
+                            body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+                        });
+                        console.log('Pull request opened');
+                        await context.octokit.issues.createComment(propened);
+                        await context.octokit.issues.addLabels(
+                            context.issue({
+                                labels: ['Pending', 'Core']
+                            })
+                        );
+                    } else {
+                        return;
                     }
-                }).then((res) => {
-                    return res.json();
-                }).then((data: GetCommit) => {
-                    return commitFileName = data.files[0].filename;
                 });
-                if (commitFileName == "src/index.ts") {
-                    const username = context.payload.sender.login;
-                    const propened = context.issue({
-                        body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
-                    });
-                    console.log('Pull request opened');
-                    await context.octokit.issues.createComment(propened);
-                    await context.octokit.issues.addLabels(
-                        context.issue({
-                            labels: ['Pending', 'Core']
-                        })
-                    );
-                }
             } else {
                 const username = context.payload.sender.login;
                 const propened = context.issue({
