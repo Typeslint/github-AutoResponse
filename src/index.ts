@@ -7,7 +7,6 @@ require("./structures/listener");
 
 module.exports = (app: Probot) => {
 
-    // Update readme profile
     app.on("push", async (context) => {
         let event1: string;
         let event2: string;
@@ -30,15 +29,19 @@ module.exports = (app: Probot) => {
                 for (i = 0; i < res.length; i++) {
                     if (res[i].type == "PushEvent") {
                         if (arrayActivity.userData.length < 5) {
-                            arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](https://github.com/${res[i].repo.url}/commit/${res[i].payload.head}) in [${res[i].repo.name}](${res[i].repo.url})`});
+                            arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](${res[i].payload.commits[0].url}) in [${res[i].repo.name}](${res[i].repo.html_url})`});
                         } else {
                             break;
                         }
                     } else if (res[i].type == "PullRequestEvent") {
-                        if (arrayActivity.userData.length < 5) {
-                            arrayActivity.userData.push({event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](${res[i].payload.pull_request.url}) in [${res[i].repo.name}](${res[i].repo.url})`});
+                        if (res[i].payload.action == "closed") {
+                            if (arrayActivity.userData.length < 5) {
+                                arrayActivity.userData.push({event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](https://github.com/${res[i].repo.name}/pull/${res[i].payload.pull_request.number}) in [${res[i].repo.name}](${res[i].repo.html_url})`});
+                            } else {
+                                break;
+                            }
                         } else {
-                            break;
+                            continue;
                         }
                     } else {
                         continue;
@@ -62,7 +65,7 @@ module.exports = (app: Probot) => {
                     ref: "main"
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 }).then(async (res: any) => {
-                    const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \n Updated at ${new Date().toUTCString()} \n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
+                    const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
                     await context.octokit.repos.createOrUpdateFileContents({
                         content: Buffer.from(textcontent, "utf-8").toString("base64"),
                         path: "README.md",
@@ -116,42 +119,46 @@ module.exports = (app: Probot) => {
     // Pull request openened
     app.on("pull_request.opened", async (context) => {
         if (context.payload.sender.type == "User") {
-            if (context.payload.repository.html_url == "https://github.com/Muunatic/github-AutoResponse") {
-                await context.octokit.pulls.listFiles({
-                    owner: 'Muunatic',
-                    repo: 'github-AutoResponse',
-                    pull_number: context.payload.number
-                }).then((res) => {
-                    return res.data;
-                }).then(async (data) => {
-                    if (data.find(a => a.filename == "src/index.ts")) {
-                        const username = context.payload.sender.login;
-                        const propened = context.issue({
-                            body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
-                        });
-                        console.log('Pull request opened');
-                        await context.octokit.issues.createComment(propened);
-                        await context.octokit.issues.addLabels(
-                            context.issue({
-                                labels: ['Pending', 'Core']
-                            })
-                        );
-                    } else {
-                        return;
-                    }
-                });
+            if (context.payload.sender.login != context.payload.repository.owner.login) {
+                if (context.payload.repository.html_url == "https://github.com/Muunatic/github-AutoResponse") {
+                    await context.octokit.pulls.listFiles({
+                        owner: 'Muunatic',
+                        repo: 'github-AutoResponse',
+                        pull_number: context.payload.number
+                    }).then((res) => {
+                        return res.data;
+                    }).then(async (data) => {
+                        if (data.find(a => a.filename == "src/index.ts")) {
+                            const username = context.payload.sender.login;
+                            const propened = context.issue({
+                                body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+                            });
+                            console.log('Pull request opened');
+                            await context.octokit.issues.createComment(propened);
+                            await context.octokit.issues.addLabels(
+                                context.issue({
+                                    labels: ['Pending', 'Core']
+                                })
+                            );
+                        } else {
+                            return;
+                        }
+                    });
+                } else {
+                    const username = context.payload.sender.login;
+                    const propened = context.issue({
+                        body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+                    });
+                    console.log('Pull request opened');
+                    await context.octokit.issues.createComment(propened);
+                    await context.octokit.issues.addLabels(
+                        context.issue({
+                            labels: ['Pending']
+                        })
+                    );
+                }
             } else {
-                const username = context.payload.sender.login;
-                const propened = context.issue({
-                    body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
-                });
-                console.log('Pull request opened');
-                await context.octokit.issues.createComment(propened);
-                await context.octokit.issues.addLabels(
-                    context.issue({
-                        labels: ['Pending']
-                    })
-                );
+                return;
             }
         } else {
             return;
@@ -478,14 +485,14 @@ module.exports = (app: Probot) => {
                         const reviewersArray: string[] = [];
                         const tagReviewers: string[] = [];
                         for (i = 0; i < res.data.length; i++) {
-                            if (res.data[i].user.type == "User") {
+                            if (res.data[i].user?.type == "User") {
                                 const datastate: string[] = [
                                     "CHANGES_REQUESTED",
                                     "APPROVED"
                                 ];
                                 if (res.data[i].state == datastate.find(a => a == res.data[i].state)) {
-                                    if (res.data[i].user.login != reviewersArray.find(a => a == res.data[i].user.login)) {
-                                        const username: string = res.data[i].user.login;
+                                    if (res.data[i].user?.login != reviewersArray.find(a => a == res.data[i].user?.login)) {
+                                        const username: string = res.data[i].user?.login || "";
                                         reviewersArray.push(username);
                                         tagReviewers.push("@" + username);
                                         await context.octokit.pulls.requestReviewers({
@@ -662,9 +669,19 @@ module.exports = (app: Probot) => {
                                     commit_message: context.payload.issue.title
                                 });
                                 console.log("Merged!");
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
                                 await context.octokit.issues.createComment(
                                     context.issue({
-                                        body: `Merged by ${context.payload.comment.user.login}!`
+                                        body: `Merged by \`[OWNER]\`${context.payload.comment.user.login}!`
+                                    })
+                                );
+                                await context.octokit.issues.addLabels(
+                                    context.issue({
+                                        labels: ['Owner Merge']
                                     })
                                 );
                             } else {
