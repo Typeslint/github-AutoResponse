@@ -23,9 +23,11 @@ export interface getEvent {
         id: number;
         name: string;
         url: string;
+        html_url: string;
     };
 
     payload: {
+        action: string;
         push_id: number;
         size: number;
         distinct_size: number;
