@@ -23,7 +23,6 @@ export interface getEvent {
         id: number;
         name: string;
         url: string;
-        html_url: string;
     };
 
     payload: {
@@ -37,6 +36,10 @@ export interface getEvent {
         pull_request: {
             url: string;
             number: number;
+            user: {
+                login: string;
+                html_url: string;
+            };
         };
         commits: [
             {
