@@ -1,9 +1,12 @@
 import fetch from "node-fetch";
 import { Probot } from "probot";
+import { Octokit } from "octokit";
 import { token } from "./data/config";
 import { getUserData, getEvent } from "./structures/interface";
 require("dotenv").config();
 require("./structures/listener");
+
+const octokit = new Octokit({auth: token});
 
 module.exports = (app: Probot) => {
 
@@ -29,14 +32,14 @@ module.exports = (app: Probot) => {
                 for (i = 0; i < res.length; i++) {
                     if (res[i].type == "PushEvent") {
                         if (arrayActivity.userData.length < 5) {
-                            arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](${res[i].payload.commits[0].url}) in [${res[i].repo.name}](${res[i].repo.html_url})`});
+                            arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](https://github.com/${res[i].repo.name}/commit/${res[i].payload.commits[0].sha}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
                         } else {
                             break;
                         }
                     } else if (res[i].type == "PullRequestEvent") {
-                        if (res[i].payload.action == "closed") {
+                        if (res[i].payload.pull_request.user.login == "Muunatic") {
                             if (arrayActivity.userData.length < 5) {
-                                arrayActivity.userData.push({event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](https://github.com/${res[i].repo.name}/pull/${res[i].payload.pull_request.number}) in [${res[i].repo.name}](${res[i].repo.html_url})`});
+                                arrayActivity.userData.push({event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](https://github.com/${res[i].repo.name}/pull/${res[i].payload.pull_request.number}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
                             } else {
                                 break;
                             }
@@ -140,6 +143,40 @@ module.exports = (app: Probot) => {
                                     labels: ['Pending', 'Core']
                                 })
                             );
+                            let shaRef: string;
+                            await octokit.rest.pulls.get({
+                                owner: 'Muunatic',
+                                repo: 'github-AutoResponse',
+                                pull_number: context.payload.number
+                            }).then(async (res) => {
+                                shaRef = res.data.head.sha;
+                                await octokit.rest.repos.getContent({
+                                    owner: 'Muunatic',
+                                    repo: 'github-AutoResponse',
+                                    ref: shaRef,
+                                    path: "tsconfig.json"
+                                }).then(async (res) => {
+                                    if ("content" in res.data) {
+                                        const textContent:string = res.data.content;
+                                        const decodeContent:string = Buffer.from(textContent, "base64").toString("utf-8");
+                                        if (decodeContent.includes('"noImplicitAny": true') && decodeContent.includes('"noImplicitThis": true') && decodeContent.includes('"strictFunctionTypes": true') && decodeContent.includes('"strictNullChecks": true')) {
+                                            return;
+                                        } else {
+                                            await context.octokit.issues.addLabels(
+                                                context.issue({
+                                                    labels: ['Config Invalid']
+                                                })
+                                            );
+                                            const configInvalid = context.issue({
+                                                body: `[tsconfig](${res.data.html_url}) need [*noImplicitAny*, *noImplicitThis*, *strictFunctionTypes*, *strictNullChecks*] to true value`
+                                            });
+                                            await context.octokit.issues.createComment(configInvalid);
+                                        }
+                                    } else {
+                                        return;
+                                    }
+                                });
+                            });
                         } else {
                             return;
                         }
@@ -158,7 +195,16 @@ module.exports = (app: Probot) => {
                     );
                 }
             } else {
-                return;
+                const propened = context.issue({
+                    body: `PRs by \`[OWNER]\`${context.payload.pull_request.user.login}!`
+                });
+                console.log('Pull request opened');
+                await context.octokit.issues.createComment(propened);
+                await context.octokit.issues.addLabels(
+                    context.issue({
+                        labels: ['Pending']
+                    })
+                );
             }
         } else {
             return;
@@ -470,7 +516,52 @@ module.exports = (app: Probot) => {
     // re-requested reviewer
     app.on("pull_request.synchronize", async (context) => {
         if (context.payload.pull_request.user.type == "User") {
-            context.octokit.issues.listLabelsOnIssue({
+            if (context.payload.repository.homepage == "https://github.com/Muunatic/github-AutoResponse") {
+                let shaRef: string;
+                await octokit.rest.pulls.get({
+                    owner: 'Muunatic',
+                    repo: 'github-AutoResponse',
+                    pull_number: context.payload.number
+                }).then(async (res) => {
+                    shaRef = res.data.head.sha;
+                    await octokit.rest.repos.getContent({
+                        owner: 'Muunatic',
+                        repo: 'github-AutoResponse',
+                        ref: shaRef,
+                        path: "tsconfig.json"
+                    }).then(async (res) => {
+                        if ("content" in res.data) {
+                            const textContent:string = res.data.content;
+                            const decodeContent:string = Buffer.from(textContent, "base64").toString("utf-8");
+                            if (decodeContent.includes('"noImplicitAny": true') && decodeContent.includes('"noImplicitThis": true') && decodeContent.includes('"strictFunctionTypes": true') && decodeContent.includes('"strictNullChecks": true')) {
+                                await context.octokit.issues.listLabelsOnIssue({
+                                    owner: context.payload.repository.owner.login,
+                                    repo: context.payload.repository.name,
+                                    issue_number: context.payload.pull_request.number
+                                }).then(async (res) => {
+                                    if (res.data.find(a => a.name == "Config Invalid")) {
+                                        await context.octokit.issues.removeLabel(
+                                            context.issue({
+                                                name: 'Config Invalid'
+                                            })
+                                        );
+                                    } else {
+                                        return;
+                                    }
+                                });
+                            } else {
+                                const configInvalid = context.issue({
+                                    body: `[tsconfig](${res.data.html_url}) need [*noImplicitAny*, *noImplicitThis*, *strictFunctionTypes*, *strictNullChecks*] to true value`
+                                });
+                                await context.octokit.issues.createComment(configInvalid);
+                            }
+                        } else {
+                            return;
+                        }
+                    });
+                });
+            }
+            await context.octokit.issues.listLabelsOnIssue({
                 owner: context.payload.repository.owner.login,
                 repo: context.payload.repository.name,
                 issue_number: context.payload.pull_request.number
@@ -519,7 +610,7 @@ module.exports = (app: Probot) => {
                                 body: `PING! ${tagReviewers.join(", ")}. The author has pushed new commits since your last review. please review @${context.payload.sender.login} new commit before merge, thanks!`
                             })
                         );
-                        context.octokit.issues.listLabelsOnIssue({
+                        await context.octokit.issues.listLabelsOnIssue({
                             owner: context.payload.repository.owner.login,
                             repo: context.payload.repository.name,
                             issue_number: context.payload.pull_request.number
@@ -549,7 +640,7 @@ module.exports = (app: Probot) => {
         if (context.payload.workflow_run.event == "pull_request") {
             if (context.payload.sender.type == "User") {
                 if (context.payload.workflow_run.conclusion == "success") {
-                    context.octokit.pulls.get({
+                    await context.octokit.pulls.get({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
                         pull_number: context.payload.workflow_run.pull_requests[0].number
@@ -669,11 +760,6 @@ module.exports = (app: Probot) => {
                                     commit_message: context.payload.issue.title
                                 });
                                 console.log("Merged!");
-                                await context.octokit.issues.removeLabel(
-                                    context.issue({
-                                        name: 'Pending'
-                                    })
-                                );
                                 await context.octokit.issues.createComment(
                                     context.issue({
                                         body: `Merged by \`[OWNER]\`${context.payload.comment.user.login}!`
@@ -682,6 +768,11 @@ module.exports = (app: Probot) => {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
                                         labels: ['Owner Merge']
+                                    })
+                                );
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
                                     })
                                 );
                             } else {
