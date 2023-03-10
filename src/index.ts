@@ -32,10 +32,17 @@ module.exports = (app: Probot) => {
                 for (i = 0; i < res.length; i++) {
                     if (res[i].type == "PushEvent") {
                         if (arrayActivity.userData.length < 5) {
-                            if (res[i].payload.commits[0].author.name == "Muunatic") {
-                                arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](https://github.com/${res[i].repo.name}/commit/${res[i].payload.commits[0].sha}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
-                            } else {
-                                continue;
+                            let commitsI: number;
+                            for (commitsI = 0; commitsI < res[i].payload.commits.length; commitsI++) {
+                                if (res[i].payload.commits[commitsI].author.name == "Muunatic") {
+                                    if (arrayActivity.userData.length < 5) {
+                                        arrayActivity.userData.push({event: `Commit on [${res[i].payload.commits[commitsI].sha.slice(0, 7)}](https://github.com/${res[i].repo.name}/commit/${res[i].payload.commits[commitsI].sha}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
+                                    } else {
+                                        break;
+                                    }
+                                } else {
+                                    continue;
+                                }
                             }
                         } else {
                             break;
