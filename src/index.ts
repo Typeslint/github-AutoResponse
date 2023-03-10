@@ -32,19 +32,23 @@ module.exports = (app: Probot) => {
                 for (i = 0; i < res.length; i++) {
                     if (res[i].type == "PushEvent") {
                         if (arrayActivity.userData.length < 5) {
-                            arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](https://github.com/${res[i].repo.name}/commit/${res[i].payload.commits[0].sha}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
+                            if (res[i].payload.commits[0].author.name == "Muunatic") {
+                                arrayActivity.userData.push({event: `Commit on [${res[i].payload.head.slice(0, 7)}](https://github.com/${res[i].repo.name}/commit/${res[i].payload.commits[0].sha}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
+                            } else {
+                                continue;
+                            }
                         } else {
                             break;
                         }
                     } else if (res[i].type == "PullRequestEvent") {
-                        if (res[i].payload.pull_request.user.login == "Muunatic") {
-                            if (arrayActivity.userData.length < 5) {
+                        if (arrayActivity.userData.length < 5) {
+                            if (res[i].payload.pull_request.user.login == "Muunatic") {
                                 arrayActivity.userData.push({event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](https://github.com/${res[i].repo.name}/pull/${res[i].payload.pull_request.number}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})`});
                             } else {
-                                break;
+                                continue;
                             }
                         } else {
-                            continue;
+                            break;
                         }
                     } else {
                         continue;
