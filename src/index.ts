@@ -77,18 +77,21 @@ module.exports = (app: Probot) => {
                     repo: "Muunatic",
                     path: "README.MD",
                     ref: "main"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                }).then(async (res: any) => {
-                    const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
-                    await context.octokit.repos.createOrUpdateFileContents({
-                        content: Buffer.from(textcontent, "utf-8").toString("base64"),
-                        path: "README.md",
-                        message: "Update Activities ✔️",
-                        owner: "Muunatic",
-                        repo: "Muunatic",
-                        branch: "main",
-                        sha: res.data.sha
-                    });
+                }).then(async (res) => {
+                    if ("sha" in res.data) {
+                        const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
+                        await context.octokit.repos.createOrUpdateFileContents({
+                            content: Buffer.from(textcontent, "utf-8").toString("base64"),
+                            path: "README.md",
+                            message: "Update Activities ✔️",
+                            owner: "Muunatic",
+                            repo: "Muunatic",
+                            branch: "main",
+                            sha: res.data.sha
+                        });
+                    } else {
+                        return;
+                    }
                 });
             }
         }
