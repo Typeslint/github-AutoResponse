@@ -1,12 +1,23 @@
 import fetch from "node-fetch";
 import { Probot } from "probot";
 import { Octokit } from "octokit";
+import { createAppAuth } from "@octokit/auth-app";
 import { token } from "./data/config";
 import { getUserData, getEvent } from "./structures/interface";
-require("dotenv").config();
-require("./structures/listener");
+import "./structures/listener";
+import dotenv from "dotenv";
+dotenv.config();
 
-const octokit = new Octokit({auth: token});
+const octokit = new Octokit({
+    authStrategy: createAppAuth,
+    auth: {
+        appId: process.env.APP_ID,
+        privateKey: process.env.PRIVATE_KEY,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        installationId: 12345678 // env not working
+    }
+});
 
 module.exports = (app: Probot) => {
 
@@ -75,21 +86,51 @@ module.exports = (app: Probot) => {
                 await context.octokit.repos.getContent({
                     owner: "Muunatic",
                     repo: "Muunatic",
-                    path: "README.MD",
+                    path: "README.md",
                     ref: "main"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                }).then(async (res: any) => {
-                    const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
-                    await context.octokit.repos.createOrUpdateFileContents({
-                        content: Buffer.from(textcontent, "utf-8").toString("base64"),
-                        path: "README.md",
-                        message: "Update Activities ✔️",
+                }).then(async (res) => {
+                    if ("sha" in res.data) {
+                        const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
+                        await context.octokit.repos.createOrUpdateFileContents({
+                            content: Buffer.from(textcontent, "utf-8").toString("base64"),
+                            path: "README.md",
+                            message: "Update Readme.md",
+                            owner: "Muunatic",
+                            repo: "Muunatic",
+                            branch: "main",
+                            sha: res.data.sha
+                        });
+                    } else {
+                        return;
+                    }
+                });
+            } else if (context.payload.sender.login == "typeslint-cli[bot]") {
+                if (context.payload.repository.name == "Muunatic") {
+                    await octokit.rest.checks.create({
                         owner: "Muunatic",
                         repo: "Muunatic",
-                        branch: "main",
-                        sha: res.data.sha
+                        name: "typeslint/ci",
+                        head_sha: context.payload.head_commit?.id,
+                        status: "in_progress"
+                    }).then(async (resId) => {
+                        await octokit.rest.checks.update({
+                            owner: "Muunatic",
+                            repo: "Muunatic",
+                            name: "typeslint/ci",
+                            check_run_id: resId.data.id,
+                            status: "completed",
+                            conclusion: "success",
+                            output: {
+                                title: "Update Activities ✔️",
+                                summary: "@" + context.payload.sender.login + " README Update"
+                            }
+                        });
                     });
-                });
+                } else {
+                    return;
+                }
+            } else {
+                return;
             }
         }
     });
@@ -99,7 +140,7 @@ module.exports = (app: Probot) => {
         if (context.payload.sender.login === 'Muunatic') return;
         const username = context.payload.sender.login;
         const issueComment = context.issue({
-            body: `Hello @${username} Thank you for submitting Issues, please wait for next notification after we review your Issues.`
+            body: `Hello @${username} Thank you for submitting Issue, please wait for next notification after we review your Issue.`
         });
         console.log('Issues created');
         await context.octokit.issues.addLabels(
@@ -113,21 +154,39 @@ module.exports = (app: Probot) => {
     // Issues closed
     app.on("issues.closed", async (context) => {
         const username = context.payload.sender.login;
-        const issueClosed = context.issue({
-            body: `Issue closed by @${username}.`
-        });
-        console.log('Issues closed');
-        await context.octokit.issues.addLabels(
-            context.issue({
-                labels: ['closed']
-            })
-        );
-        await context.octokit.issues.removeLabel(
-            context.issue({
-                name: 'Pending'
-            })
-        );
-        await context.octokit.issues.createComment(issueClosed);
+        if (context.payload.issue.state_reason == "not_planned") {
+            const issueClosed = context.issue({
+                body: `Issue closed as invalid by @${username}.`
+            });
+            console.log('Issues closed');
+            await context.octokit.issues.addLabels(
+                context.issue({
+                    labels: ['closed', 'Invalid']
+                })
+            );
+            await context.octokit.issues.removeLabel(
+                context.issue({
+                    name: 'Pending'
+                })
+            );
+            await context.octokit.issues.createComment(issueClosed);
+        } else {
+            const issueClosed = context.issue({
+                body: `Issue closed by @${username}.`
+            });
+            console.log('Issues closed');
+            await context.octokit.issues.addLabels(
+                context.issue({
+                    labels: ['closed']
+                })
+            );
+            await context.octokit.issues.removeLabel(
+                context.issue({
+                    name: 'Pending'
+                })
+            );
+            await context.octokit.issues.createComment(issueClosed);
+        }
     });
 
     // Pull request openened
@@ -771,6 +830,11 @@ module.exports = (app: Probot) => {
                                     commit_message: context.payload.issue.title
                                 });
                                 console.log("Merged!");
+                                await context.octokit.issues.removeLabel(
+                                    context.issue({
+                                        name: 'Pending'
+                                    })
+                                );
                                 await context.octokit.issues.createComment(
                                     context.issue({
                                         body: `Merged by \`[OWNER]\`${context.payload.comment.user.login}!`
@@ -779,11 +843,6 @@ module.exports = (app: Probot) => {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
                                         labels: ['Owner Merge']
-                                    })
-                                );
-                                await context.octokit.issues.removeLabel(
-                                    context.issue({
-                                        name: 'Pending'
                                     })
                                 );
                             } else {
