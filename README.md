@@ -1,6 +1,6 @@
 # GitHub-AutoResponse
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that A Probot app
+> A GitHub App built with [Probot](https://github.com/probot/probot) framework
 
 ## Setup
 
@@ -8,7 +8,7 @@
 # Install dependencies
 npm install
 
-# Run the bot
+# Run the client
 npm start
 ```
 
