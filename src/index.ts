@@ -22,11 +22,7 @@ const octokit = new Octokit({
 module.exports = (app: Probot) => {
 
     app.on("push", async (context) => {
-        let event1: string;
-        let event2: string;
-        let event3: string;
-        let event4: string;
-        let event5: string;
+        let event1: string, event2: string, event3: string, event4: string, event5: string;
         async function userActivity() {
             const arrayActivity: getUserData = {"userData": []};
             await fetch('https://api.github.com/users/Muunatic/events/public', {
@@ -193,9 +189,9 @@ module.exports = (app: Probot) => {
     app.on("pull_request.opened", async (context) => {
         if (context.payload.sender.type == "User") {
             if (context.payload.sender.login != context.payload.repository.owner.login) {
-                if (context.payload.repository.html_url == "https://github.com/Muunatic/github-AutoResponse") {
+                if (context.payload.repository.html_url == "https://github.com/Typeslint/github-AutoResponse") {
                     await context.octokit.pulls.listFiles({
-                        owner: 'Muunatic',
+                        owner: 'Typeslint',
                         repo: 'github-AutoResponse',
                         pull_number: context.payload.number
                     }).then((res) => {
@@ -215,13 +211,13 @@ module.exports = (app: Probot) => {
                             );
                             let shaRef: string;
                             await octokit.rest.pulls.get({
-                                owner: 'Muunatic',
+                                owner: 'Typeslint',
                                 repo: 'github-AutoResponse',
                                 pull_number: context.payload.number
                             }).then(async (res) => {
                                 shaRef = res.data.head.sha;
                                 await octokit.rest.repos.getContent({
-                                    owner: 'Muunatic',
+                                    owner: 'Typeslint',
                                     repo: 'github-AutoResponse',
                                     ref: shaRef,
                                     path: "tsconfig.json"
@@ -586,16 +582,16 @@ module.exports = (app: Probot) => {
     // re-requested reviewer
     app.on("pull_request.synchronize", async (context) => {
         if (context.payload.pull_request.user.type == "User") {
-            if (context.payload.repository.homepage == "https://github.com/Muunatic/github-AutoResponse") {
+            if (context.payload.repository.homepage == "https://github.com/Typeslint/github-AutoResponse") {
                 let shaRef: string;
                 await octokit.rest.pulls.get({
-                    owner: 'Muunatic',
+                    owner: 'Typeslint',
                     repo: 'github-AutoResponse',
                     pull_number: context.payload.number
                 }).then(async (res) => {
                     shaRef = res.data.head.sha;
                     await octokit.rest.repos.getContent({
-                        owner: 'Muunatic',
+                        owner: 'Typeslint',
                         repo: 'github-AutoResponse',
                         ref: shaRef,
                         path: "tsconfig.json"
