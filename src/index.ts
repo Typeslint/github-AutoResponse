@@ -157,7 +157,7 @@ module.exports = (app: Probot) => {
             console.log('Issues closed');
             await context.octokit.issues.addLabels(
                 context.issue({
-                    labels: ['closed', 'Invalid']
+                    labels: ['Closed', 'Invalid']
                 })
             );
             await context.octokit.issues.removeLabel(
@@ -173,7 +173,7 @@ module.exports = (app: Probot) => {
             console.log('Issues closed');
             await context.octokit.issues.addLabels(
                 context.issue({
-                    labels: ['closed']
+                    labels: ['Closed']
                 })
             );
             await context.octokit.issues.removeLabel(
