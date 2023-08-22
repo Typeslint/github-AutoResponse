@@ -1173,7 +1173,7 @@ module.exports = (app: Probot) => {
                                                             owner: res.data.base.repo.owner.login,
                                                             repo: res.data.base.repo.name,
                                                             issue_number: res.data.number,
-                                                            labels: ["Closed"]
+                                                            labels: ["Stale"]
                                                         });
                                                         await octokit.rest.issues.createComment({
                                                             owner: res.data.base.repo.owner.login,
