@@ -1120,20 +1120,6 @@ module.exports = (app: Probot) => {
                                                     state: "closed"
                                                 }).then(async (res) => {
                                                     if (res.data.labels.find((a) => a.name == "Stale")) {
-                                                        const prsReviewers: string[] = [];
-                                                        octokit.rest.pulls.listReviewComments({
-                                                            owner: res.data.base.repo.owner.login,
-                                                            repo: res.data.base.repo.name,
-                                                            pull_number: res.data.number
-                                                        }).then(async (res) => {
-                                                            if (res.data.length !== 0) {
-                                                                for (let i = 0; i < res.data.length; i++) {
-                                                                    prsReviewers.push("@" + res.data[i].user?.login);
-                                                                }
-                                                            } else {
-                                                                prsReviewers.push("@Muunatic");
-                                                            }
-                                                        });
                                                         await octokit.rest.issues.addLabels({
                                                             owner: res.data.base.repo.owner.login,
                                                             repo: res.data.base.repo.name,
