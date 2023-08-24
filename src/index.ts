@@ -133,7 +133,7 @@ module.exports = (app: Probot) => {
 
     // Issues opened
     app.on("issues.opened", async (context) => {
-        if (context.payload.sender.login === 'Muunatic') return;
+        if (context.payload.sender.login === "Muunatic") return;
         const username = context.payload.sender.login;
         const issueComment = context.issue({
             body: `Hello @${username} Thank you for submitting Issue, please wait for next notification after we review your Issue.`
@@ -745,14 +745,14 @@ module.exports = (app: Probot) => {
             if (context.payload.repository.homepage == "https://github.com/Typeslint/github-AutoResponse") {
                 let shaRef: string;
                 await octokit.rest.pulls.get({
-                    owner: 'Typeslint',
-                    repo: 'github-AutoResponse',
+                    owner: "Typeslint",
+                    repo: "github-AutoResponse",
                     pull_number: context.payload.number
                 }).then(async (res) => {
                     shaRef = res.data.head.sha;
                     await octokit.rest.repos.getContent({
-                        owner: 'Typeslint',
-                        repo: 'github-AutoResponse',
+                        owner: "Typeslint",
+                        repo: "github-AutoResponse",
                         ref: shaRef,
                         path: "tsconfig.json"
                     }).then(async (res) => {
@@ -1136,7 +1136,7 @@ module.exports = (app: Probot) => {
                                                             owner: res.data.base.repo.owner.login,
                                                             repo: res.data.base.repo.name,
                                                             issue_number: res.data.number,
-                                                            body: `Hello @${res.data.user.login}! We've observed that your pull requests have remained inactive for the last 30 days. Due to this prolonged inactivity, we've had to close these PRs. If you still intend to pursue these changes, please feel free to create new PRs.`
+                                                            body: `Hello @${res.data.user?.login}! We've observed that your pull requests have remained inactive for the last 30 days. Due to this prolonged inactivity, we've had to close these PRs. If you still intend to pursue these changes, please feel free to create new PRs.`
                                                         });
                                                         octokit.rest.issues.lock({
                                                             owner: currentOwner,
@@ -1154,7 +1154,9 @@ module.exports = (app: Probot) => {
                                                     repo: currentRepo,
                                                     pull_number: currentPRs
                                                 }).then(async (res) => {
-                                                    if (res.data.labels.find((a) => a.name != "Stale")) {
+                                                    if (res.data.labels.find((a) => a.name == "Stale")) {
+                                                        return;
+                                                    } else {
                                                         const prsReviewers: string[] = [];
                                                         octokit.rest.pulls.listReviewComments({
                                                             owner: res.data.base.repo.owner.login,
@@ -1179,10 +1181,8 @@ module.exports = (app: Probot) => {
                                                             owner: res.data.base.repo.owner.login,
                                                             repo: res.data.base.repo.name,
                                                             issue_number: res.data.number,
-                                                            body: `Hello @${res.data.user.login}! We noticed that your pull request has been inactive for the past 7 days. If you've already received a response from the maintainer, please ensure that you review and address the feedback provided. If not, please reach out to the maintainer to seek clarification or assistance if needed.\n\n Additionally, we'd appreciate it if ${prsReviewers.join(", ")} could also take a moment to review the pull request and provide feedback.`
+                                                            body: `Hello @${res.data.user?.login}! We noticed that your pull request has been inactive for the past 7 days. If you've already received a response from the maintainer, please ensure that you review and address the feedback provided. If not, please reach out to the maintainer to seek clarification or assistance if needed.\n\n Additionally, we'd appreciate it if ${prsReviewers.join(", ")} could also take a moment to review the pull request and provide feedback.`
                                                         });
-                                                    } else {
-                                                        return;
                                                     }
                                                 });
                                             }
