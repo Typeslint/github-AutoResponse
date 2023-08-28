@@ -986,6 +986,12 @@ module.exports = (app: Probot) => {
                                         body: `Merging blocked because PRs has merge conflict! @${context.payload.comment.user.login}`
                                     })
                                 );
+                            } else if (res.data.mergeable == null) {
+                                await context.octokit.issues.createComment(
+                                    context.issue({
+                                        body: `give reply from automaton that github automaton can't proceed merging commit, please wait for any minute before attempting to merge it again.`
+                                    })
+                                );
                             }
                         });
                     }
