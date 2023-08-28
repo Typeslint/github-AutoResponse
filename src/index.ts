@@ -940,40 +940,54 @@ module.exports = (app: Probot) => {
                 case "User":
                     // Merge pull request
                     if (context.payload.comment.body.toLowerCase() == "ready to merge") {
-                        if (context.payload.issue.user.login == context.payload.comment.user.login) {
-                            let i: number;
-                            for (i = 0; i < context.payload.issue.labels.length; i++) {
-                                if (context.payload.issue.labels[i].name == "Approved") {
-                                    console.log("Merging");
-                                    await context.octokit.pulls.merge({
-                                        repo: context.payload.repository.name,
-                                        owner: context.payload.repository.owner.login,
-                                        pull_number: context.payload.issue.number,
-                                        commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
-                                        commit_message: context.payload.issue.title
-                                    });
-                                    console.log("Merged!");
-                                    await context.octokit.issues.createComment(
-                                        context.issue({
-                                            body: `Merged by ${context.payload.comment.user.login}!`
-                                        })
-                                    );
-                                    break;
-                                } else if (context.payload.issue.labels[i].name == "Requested Changes") {
-                                    console.log('PRs Blocked');
-                                    await context.octokit.issues.createComment(
-                                        context.issue({
-                                            body: `Merging blocked because PRs has requested changes! @${context.payload.comment.user.login}`
-                                        })
-                                    );
-                                    break;
+                        context.octokit.pulls.get({
+                            repo: context.payload.repository.name,
+                            owner: context.payload.repository.owner.login,
+                            pull_number: context.payload.issue.number
+                        }).then(async (res) => {
+                            if (res.data.mergeable_state.toLowerCase() == "clean" || res.data.mergeable == true) {
+                                if (context.payload.issue.user.login == context.payload.comment.user.login) {
+                                    let i: number;
+                                    for (i = 0; i < context.payload.issue.labels.length; i++) {
+                                        if (context.payload.issue.labels[i].name == "Approved") {
+                                            console.log("Merging");
+                                            await context.octokit.pulls.merge({
+                                                repo: context.payload.repository.name,
+                                                owner: context.payload.repository.owner.login,
+                                                pull_number: context.payload.issue.number,
+                                                commit_title: `Merge PR #${context.payload.issue.number} ${context.payload.issue.title}`,
+                                                commit_message: context.payload.issue.title
+                                            });
+                                            console.log("Merged!");
+                                            await context.octokit.issues.createComment(
+                                                context.issue({
+                                                    body: `Merged by ${context.payload.comment.user.login}!`
+                                                })
+                                            );
+                                            break;
+                                        } else if (context.payload.issue.labels[i].name == "Requested Changes") {
+                                            console.log("PRs Blocked");
+                                            await context.octokit.issues.createComment(
+                                                context.issue({
+                                                    body: `Merging blocked because PRs has requested changes! @${context.payload.comment.user.login}`
+                                                })
+                                            );
+                                            break;
+                                        } else {
+                                            continue;
+                                        }
+                                    }
                                 } else {
-                                    continue;
+                                    return;
                                 }
+                            } else if (res.data.mergeable_state.toLowerCase() == "dirty" || res.data.mergeable == false) {
+                                await context.octokit.issues.createComment(
+                                    context.issue({
+                                        body: `Merging blocked because PRs has merge conflict! @${context.payload.comment.user.login}`
+                                    })
+                                );
                             }
-                        } else {
-                            return;
-                        }
+                        });
                     }
 
                     if (context.payload.comment.body.toLowerCase() == "merge") {
