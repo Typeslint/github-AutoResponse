@@ -989,7 +989,7 @@ module.exports = (app: Probot) => {
                             } else if (res.data.mergeable == null) {
                                 await context.octokit.issues.createComment(
                                     context.issue({
-                                        body: `give reply from automaton that github automaton can't proceed merging commit, please wait for any minute before attempting to merge it again.`
+                                        body: `We apologize for the inconvenience, but it seems that Automaton processes are currently unable to proceed with merging your commit. Please wait for a moment and try merging it again.`
                                     })
                                 );
                             }
