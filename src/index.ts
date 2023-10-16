@@ -244,7 +244,17 @@ module.exports = (app: Probot) => {
                                 });
                             });
                         } else {
-                            return;
+                            const username = context.payload.sender.login;
+                            const propened = context.issue({
+                                body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+                            });
+                            console.log('Pull request opened');
+                            await context.octokit.issues.createComment(propened);
+                            await context.octokit.issues.addLabels(
+                                context.issue({
+                                    labels: ['Pending']
+                                })
+                            );
                         }
                     });
                 } else {
