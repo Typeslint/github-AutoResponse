@@ -1,8 +1,8 @@
 FROM node:18
-WORKDIR /usr/src/app
+WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --production
+RUN npm ci
 RUN npm cache clean --force
 ENV NODE_ENV="production"
 COPY . .
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "build:start" ]
