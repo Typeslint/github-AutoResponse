@@ -337,7 +337,7 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I"m merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
@@ -417,7 +417,7 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I"m merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
@@ -498,7 +498,7 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I"m merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             await context.octokit.issues.addLabels(
@@ -562,7 +562,7 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `@${context.payload.pull_request.user.login} your pull request has requested changes by \`[OWNER]\`@${context.payload.review.user.login}. Please address their comments before I"m merging this PR, thanks!`,
+                                body: `@${context.payload.pull_request.user.login} your pull request has requested changes by \`[OWNER]\`@${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
@@ -642,7 +642,7 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by \`[MAINTAINER]\`@${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I"m merging this PR, thanks!`,
+                                body: `Pull request has requested changes by \`[MAINTAINER]\`@${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I"m merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
@@ -723,7 +723,7 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `@${context.payload.pull_request.user.login} your pull request has requested changes by @${context.payload.review.user.login}. Please address their comments before I"m merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             await context.octokit.issues.addLabels(
@@ -1166,7 +1166,7 @@ module.exports = (app: Probot) => {
                                                                 owner: res.data.base.repo.owner.login,
                                                                 repo: res.data.base.repo.name,
                                                                 issue_number: res.data.number,
-                                                                body: `Hello @${res.data.user?.login}! We"ve observed that your pull requests have remained inactive for the last 30 days. Due to this prolonged inactivity, we"ve had to close these PRs. If you still intend to pursue these changes, please feel free to create new PRs.`
+                                                                body: `Hello @${res.data.user?.login}! We've observed that your pull requests have remained inactive for the last 30 days. Due to this prolonged inactivity, we've had to close these PRs. If you still intend to pursue these changes, please feel free to create new PRs.`
                                                             });
                                                             await octokit.rest.issues.lock({
                                                                 owner: currentOwner,
@@ -1211,7 +1211,7 @@ module.exports = (app: Probot) => {
                                                                 owner: res.data.base.repo.owner.login,
                                                                 repo: res.data.base.repo.name,
                                                                 issue_number: res.data.number,
-                                                                body: `Hello @${res.data.user?.login}! We noticed that your pull request has been inactive for the past 7 days. If you"ve already received a response from the maintainer, please ensure that you review and address the feedback provided. If not, please reach out to the maintainer to seek clarification or assistance if needed.\n\n Additionally, we"d appreciate it if ${prsReviewers.join(", ")} could also take a moment to review the pull request and provide feedback.`
+                                                                body: `Hello @${res.data.user?.login}! We noticed that your pull request has been inactive for the past 7 days. If you've already received a response from the maintainer, please ensure that you review and address the feedback provided. If not, please reach out to the maintainer to seek clarification or assistance if needed.\n\n Additionally, we'd appreciate it if ${prsReviewers.join(", ")} could also take a moment to review the pull request and provide feedback.`
                                                             });
                                                         }
                                                     });
