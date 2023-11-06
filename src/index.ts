@@ -1,4 +1,3 @@
-// import fetch, { Response } from "node-fetch";
 import { Probot } from "probot";
 import { Octokit } from "octokit";
 import { createAppAuth } from "@octokit/auth-app";
