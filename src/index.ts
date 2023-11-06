@@ -24,12 +24,12 @@ module.exports = (app: Probot) => {
         let event1: string, event2: string, event3: string, event4: string, event5: string;
         async function userActivity() {
             const arrayActivity: getUserData = {"userData": []};
-            await fetch('https://api.github.com/users/Muunatic/events/public', {
-                method: 'GET',
+            await fetch("https://api.github.com/users/Muunatic/events/public", {
+                method: "GET",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
                 }
             }).then((res: Response) => {
                 return res.json();
@@ -137,10 +137,10 @@ module.exports = (app: Probot) => {
         const issueComment = context.issue({
             body: `Hello @${username} Thank you for submitting Issue, please wait for next notification after we review your Issue.`
         });
-        console.log('Issues created');
+        console.log("Issues created");
         await context.octokit.issues.addLabels(
             context.issue({
-                labels: ['Pending']
+                labels: ["Pending"]
             })
         );
         await context.octokit.issues.createComment(issueComment);
@@ -153,15 +153,15 @@ module.exports = (app: Probot) => {
             const issueClosed = context.issue({
                 body: `Issue closed as invalid by @${username}.`
             });
-            console.log('Issues closed');
+            console.log("Issues closed");
             await context.octokit.issues.addLabels(
                 context.issue({
-                    labels: ['Closed', 'Invalid']
+                    labels: ["Closed", "Invalid"]
                 })
             );
             await context.octokit.issues.removeLabel(
                 context.issue({
-                    name: 'Pending'
+                    name: "Pending"
                 })
             );
             await context.octokit.issues.createComment(issueClosed);
@@ -169,15 +169,15 @@ module.exports = (app: Probot) => {
             const issueClosed = context.issue({
                 body: `Issue closed by @${username}.`
             });
-            console.log('Issues closed');
+            console.log("Issues closed");
             await context.octokit.issues.addLabels(
                 context.issue({
-                    labels: ['Closed']
+                    labels: ["Closed"]
                 })
             );
             await context.octokit.issues.removeLabel(
                 context.issue({
-                    name: 'Pending'
+                    name: "Pending"
                 })
             );
             await context.octokit.issues.createComment(issueClosed);
@@ -201,11 +201,11 @@ module.exports = (app: Probot) => {
                             const propened = context.issue({
                                 body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
                             });
-                            console.log('Pull request opened');
+                            console.log("Pull request opened");
                             await context.octokit.issues.createComment(propened);
                             await context.octokit.issues.addLabels(
                                 context.issue({
-                                    labels: ['Pending', 'Core']
+                                    labels: ["Pending", "Core"]
                                 })
                             );
                             let shaRef: string;
@@ -224,12 +224,12 @@ module.exports = (app: Probot) => {
                                     if ("content" in res.data) {
                                         const textContent:string = res.data.content;
                                         const decodeContent:string = Buffer.from(textContent, "base64").toString("utf-8");
-                                        if (decodeContent.includes('"noImplicitAny": true') && decodeContent.includes('"noImplicitThis": true') && decodeContent.includes('"strictFunctionTypes": true') && decodeContent.includes('"strictNullChecks": true')) {
+                                        if (decodeContent.includes("\"noImplicitAny\": true") && decodeContent.includes("\"noImplicitThis\": true") && decodeContent.includes("\"strictFunctionTypes\": true") && decodeContent.includes("\"strictNullChecks\": true")) {
                                             return;
                                         } else {
                                             await context.octokit.issues.addLabels(
                                                 context.issue({
-                                                    labels: ['Config Invalid']
+                                                    labels: ["Config Invalid"]
                                                 })
                                             );
                                             const configInvalid = context.issue({
@@ -247,11 +247,11 @@ module.exports = (app: Probot) => {
                             const propened = context.issue({
                                 body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
                             });
-                            console.log('Pull request opened');
+                            console.log("Pull request opened");
                             await context.octokit.issues.createComment(propened);
                             await context.octokit.issues.addLabels(
                                 context.issue({
-                                    labels: ['Pending']
+                                    labels: ["Pending"]
                                 })
                             );
                         }
@@ -261,11 +261,11 @@ module.exports = (app: Probot) => {
                     const propened = context.issue({
                         body: `Hello @${username} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
                     });
-                    console.log('Pull request opened');
+                    console.log("Pull request opened");
                     await context.octokit.issues.createComment(propened);
                     await context.octokit.issues.addLabels(
                         context.issue({
-                            labels: ['Pending']
+                            labels: ["Pending"]
                         })
                     );
                 }
@@ -273,11 +273,11 @@ module.exports = (app: Probot) => {
                 const propened = context.issue({
                     body: `PRs by \`[OWNER]\`${context.payload.pull_request.user.login}!`
                 });
-                console.log('Pull request opened');
+                console.log("Pull request opened");
                 await context.octokit.issues.createComment(propened);
                 await context.octokit.issues.addLabels(
                     context.issue({
-                        labels: ['Pending']
+                        labels: ["Pending"]
                     })
                 );
             }
@@ -304,31 +304,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -337,37 +337,37 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I'm merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Approved'
+                                        name: "Approved"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -384,31 +384,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -417,37 +417,37 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I'm merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Approved'
+                                        name: "Approved"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -465,31 +465,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Others Approved']
+                                        labels: ["Others Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Others Approved']
+                                        labels: ["Others Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -498,18 +498,18 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I'm merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             await context.octokit.issues.addLabels(
                                 context.issue({
-                                    labels: ['Requested Changes']
+                                    labels: ["Requested Changes"]
                                 })
                             );
-                            console.log('PRs Requested Changes');
+                            console.log("PRs Requested Changes");
                             await context.octokit.issues.removeLabel(
                                 context.issue({
-                                    name: 'Pending'
+                                    name: "Pending"
                                 })
                             );
                         }
@@ -529,31 +529,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -568,31 +568,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Approved'
+                                        name: "Approved"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -609,31 +609,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Approved']
+                                        labels: ["Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -642,37 +642,37 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `Pull request has requested changes by \`[MAINTAINER]\`@${context.payload.review.user.login}. PING! @${context.payload.repository.owner.login} Please address their comments before I'm merging this PR, thanks!`,
+                                body: `Pull request has requested changes by \`[MAINTAINER]\`@${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I"m merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             if (context.payload.pull_request.labels.find(a => a.name == "Approved")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Approved'
+                                        name: "Approved"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Requested Changes']
+                                        labels: ["Requested Changes"]
                                     })
                                 );
-                                console.log('PRs Requested Changes');
+                                console.log("PRs Requested Changes");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -690,31 +690,31 @@ module.exports = (app: Probot) => {
                             if (context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
-                                console.log('Label removed');
+                                console.log("Label removed");
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Others Approved']
+                                        labels: ["Others Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             } else {
                                 await context.octokit.issues.addLabels(
                                     context.issue({
-                                        labels: ['Others Approved']
+                                        labels: ["Others Approved"]
                                     })
                                 );
-                                console.log('PRs Approved');
+                                console.log("PRs Approved");
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Pending'
+                                        name: "Pending"
                                     })
                                 );
                             }
@@ -723,18 +723,18 @@ module.exports = (app: Probot) => {
                                 repo: context.payload.repository.name,
                                 owner: context.payload.repository.owner.login,
                                 pull_number: context.payload.pull_request.number,
-                                body: `@${context.payload.pull_request.user.login} your pull request has requested changes by @${context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
+                                body: `Pull request has requested changes by @${context.payload.review.user.login}. PING! @${context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                                 event: "COMMENT"
                             });
                             await context.octokit.issues.addLabels(
                                 context.issue({
-                                    labels: ['Requested Changes']
+                                    labels: ["Requested Changes"]
                                 })
                             );
-                            console.log('PRs Requested Changes');
+                            console.log("PRs Requested Changes");
                             await context.octokit.issues.removeLabel(
                                 context.issue({
-                                    name: 'Pending'
+                                    name: "Pending"
                                 })
                             );
                         }
@@ -768,7 +768,7 @@ module.exports = (app: Probot) => {
                         if ("content" in res.data) {
                             const textContent:string = res.data.content;
                             const decodeContent:string = Buffer.from(textContent, "base64").toString("utf-8");
-                            if (decodeContent.includes('"noImplicitAny": true') && decodeContent.includes('"noImplicitThis": true') && decodeContent.includes('"strictFunctionTypes": true') && decodeContent.includes('"strictNullChecks": true')) {
+                            if (decodeContent.includes("\"noImplicitAny\": true") && decodeContent.includes("\"noImplicitThis\": true") && decodeContent.includes("\"strictFunctionTypes\": true") && decodeContent.includes("\"strictNullChecks\": true")) {
                                 await context.octokit.issues.listLabelsOnIssue({
                                     owner: context.payload.repository.owner.login,
                                     repo: context.payload.repository.name,
@@ -777,7 +777,7 @@ module.exports = (app: Probot) => {
                                     if (res.data.find(a => a.name == "Config Invalid")) {
                                         await context.octokit.issues.removeLabel(
                                             context.issue({
-                                                name: 'Config Invalid'
+                                                name: "Config Invalid"
                                             })
                                         );
                                     } else {
@@ -853,7 +853,7 @@ module.exports = (app: Probot) => {
                             if (res.data.find(a => a.name == "Requested Changes")) {
                                 await context.octokit.issues.removeLabel(
                                     context.issue({
-                                        name: 'Requested Changes'
+                                        name: "Requested Changes"
                                     })
                                 );
                             } else {
@@ -886,22 +886,22 @@ module.exports = (app: Probot) => {
                                     owner: context.payload.repository.owner.login,
                                     repo: context.payload.repository.name,
                                     issue_number: context.payload.workflow_run.pull_requests[0].number,
-                                    name: 'CI Failed'
+                                    name: "CI Failed"
                                 })
                             );
-                            console.log('CI Passed!');
+                            console.log("CI Passed!");
                         } else {
                             return;
                         }
                     });
                 } else if (context.payload.workflow_run.conclusion == "failure") {
-                    console.log('CI Failure!');
+                    console.log("CI Failure!");
                     await context.octokit.issues.addLabels(
                         context.issue({
                             owner: context.payload.repository.owner.login,
                             repo: context.payload.repository.name,
                             issue_number: context.payload.workflow_run.pull_requests[0].number,
-                            labels: ['CI Failed']
+                            labels: ["CI Failed"]
                         })
                     );
                     await context.octokit.issues.createComment(
@@ -922,7 +922,7 @@ module.exports = (app: Probot) => {
                             owner: context.payload.repository.owner.login,
                             repo: context.payload.repository.name,
                             issue_number: context.payload.workflow_run.pull_requests[0].number,
-                            labels: ['CI Failed']
+                            labels: ["CI Failed"]
                         })
                     );
                     await context.octokit.issues.createComment(
@@ -998,7 +998,7 @@ module.exports = (app: Probot) => {
                             } else if (res.data.mergeable == null) {
                                 await context.octokit.issues.createComment(
                                     context.issue({
-                                        body: `We apologize for the inconvenience, but it seems that Automaton processes are currently unable to proceed with merging your commit. Please wait for a moment and try merging it again.`
+                                        body: "We apologize for the inconvenience, but it seems that Automaton processes are currently unable to proceed with merging your commit. Please wait for a moment and try merging it again."
                                     })
                                 );
                             }
@@ -1017,7 +1017,7 @@ module.exports = (app: Probot) => {
                             console.log("Merged!");
                             await context.octokit.issues.removeLabel(
                                 context.issue({
-                                    name: 'Pending'
+                                    name: "Pending"
                                 })
                             );
                             await context.octokit.issues.createComment(
@@ -1027,7 +1027,7 @@ module.exports = (app: Probot) => {
                             );
                             await context.octokit.issues.addLabels(
                                 context.issue({
-                                    labels: ['Owner Merge']
+                                    labels: ["Owner Merge"]
                                 })
                             );
                         } else if (context.payload.issue.author_association === "MEMBER" || context.payload.issue.author_association === "COLLABORATOR") {
@@ -1041,7 +1041,7 @@ module.exports = (app: Probot) => {
                             console.log("Merged!");
                             await context.octokit.issues.removeLabel(
                                 context.issue({
-                                    name: 'Pending'
+                                    name: "Pending"
                                 })
                             );
                             await context.octokit.issues.createComment(
@@ -1068,7 +1068,7 @@ module.exports = (app: Probot) => {
                             console.log("Merged!");
                             await context.octokit.issues.removeLabel(
                                 context.issue({
-                                    name: 'Pending'
+                                    name: "Pending"
                                 })
                             );
                             await context.octokit.issues.createComment(
@@ -1078,7 +1078,7 @@ module.exports = (app: Probot) => {
                             );
                             await context.octokit.issues.addLabels(
                                 context.issue({
-                                    labels: ['Owner Merge']
+                                    labels: ["Owner Merge"]
                                 })
                             );
                         } else if (context.payload.issue.author_association === "MEMBER" || context.payload.issue.author_association === "COLLABORATOR") {
@@ -1092,7 +1092,7 @@ module.exports = (app: Probot) => {
                             console.log("Merged!");
                             await context.octokit.issues.removeLabel(
                                 context.issue({
-                                    name: 'Pending'
+                                    name: "Pending"
                                 })
                             );
                             await context.octokit.issues.createComment(
