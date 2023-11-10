@@ -802,7 +802,8 @@ module.exports = (app: Probot) => {
                 issue_number: context.payload.pull_request.number
             }).then(async (res) => {
                 let i: number;
-                if (res.data.find(a => a.name == "Requested Changes")) {
+                const prsLabels = res.data.find(a => a.name == "Requested Changes" || a.name == "Approved")?.name;
+                if (prsLabels) {
                     await context.octokit.pulls.listReviews({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
@@ -821,6 +822,13 @@ module.exports = (app: Probot) => {
                                         const username: string = res.data[i].user?.login || "";
                                         reviewersArray.push(username);
                                         tagReviewers.push("@" + username);
+                                        await context.octokit.pulls.dismissReview({
+                                            owner: context.payload.repository.owner.login,
+                                            repo: context.payload.repository.name,
+                                            pull_number: context.payload.pull_request.number,
+                                            review_id: res.data[i].id,
+                                            message: "This review is stale and has been dismissed."
+                                        });
                                         await context.octokit.pulls.requestReviewers({
                                             owner: context.payload.repository.owner.login,
                                             repo: context.payload.repository.name,
@@ -845,23 +853,13 @@ module.exports = (app: Probot) => {
                                 body: `PING! ${tagReviewers.join(", ")}. The author has pushed new commits since your last review. please review @${context.payload.sender.login} new commit before merge, thanks!`
                             })
                         );
-                        await context.octokit.issues.listLabelsOnIssue({
-                            owner: context.payload.repository.owner.login,
-                            repo: context.payload.repository.name,
-                            issue_number: context.payload.pull_request.number
-                        }).then(async (res) => {
-                            if (res.data.find(a => a.name == "Requested Changes")) {
-                                await context.octokit.issues.removeLabel(
-                                    context.issue({
-                                        name: "Requested Changes"
-                                    })
-                                );
-                            } else {
-                                return;
-                            }
-                        });
+                        await context.octokit.issues.removeLabel(
+                            context.issue({
+                                name: prsLabels
+                            })
+                        );
                     });
-                } else if (res.data.find(a => a.name == "Approved")) {
+                } else {
                     return;
                 }
             });
