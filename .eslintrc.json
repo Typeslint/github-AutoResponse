@@ -33,9 +33,12 @@
             "after": true,
             "before": true
         }],
+        "no-trailing-spaces": 1,
         "no-unused-vars": 1,
         "no-useless-escape": 0,
-        "no-trailing-spaces": 1,
+        "quotes": ["warn", "double", {
+            "avoidEscape": false
+        }],
         "semi": "error",
         "semi-style": ["warn", "last"],
         "@typescript-eslint/member-delimiter-style": ["warn", {
