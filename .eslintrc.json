@@ -24,10 +24,17 @@
             "ignoreImports": true
         }],
         "comma-dangle": ["error", "never"],
+        "comma-spacing": ["warn", {
+            "after": true,
+            "before": false
+        }],
         "comma-style": ["warn", "last"],
         "eol-last": ["warn", "always"],
         "indent": ["warn", 4, {
             "SwitchCase": 1
+        }],
+        "key-spacing": ["warn", {
+            "mode": "strict"
         }],
         "keyword-spacing": ["warn", {
             "after": true,
@@ -36,11 +43,22 @@
         "no-trailing-spaces": 1,
         "no-unused-vars": 1,
         "no-useless-escape": 0,
+        "object-curly-spacing": ["error", "always", { 
+            "objectsInObjects": true,
+            "arraysInObjects": true
+        }],
         "quotes": ["warn", "double", {
             "avoidEscape": false
         }],
         "semi": "error",
         "semi-style": ["warn", "last"],
+        "sort-imports": ["warn", {
+            "ignoreCase": false,
+            "ignoreDeclarationSort": true
+        }],
+        "@typescript-eslint/explicit-function-return-type": ["warn", {
+            "allowExpressions": true
+        }],
         "@typescript-eslint/member-delimiter-style": ["warn", {
             "multiline": {
               "delimiter": "semi",
@@ -52,6 +70,7 @@
             },
             "multilineDetection": "brackets"
         }],
+        "@typescript-eslint/no-unnecessary-condition": 2,
         "@typescript-eslint/no-var-requires": 0
     },
     "ignorePatterns": ["dist/*.js", "dist/**/*.js"]
