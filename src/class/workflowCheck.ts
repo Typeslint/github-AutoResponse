@@ -61,7 +61,7 @@ export default class WorkflowCheck {
             head: `${this.context.payload.workflow_run.actor.login}:${this.context.payload.workflow_run.head_branch}`,
             state: "open"
         }).then(async (res) => {
-            const prsNumber = res.data[0].number;
+            const prsNumber = res.data.find((a) => a.head.sha === this.context.payload.workflow_run.head_sha)?.number as number;
             if (this.context.payload.workflow_run.conclusion == "success") {
                 await this.context.octokit.pulls.get({
                     owner: this.context.payload.repository.owner.login,
