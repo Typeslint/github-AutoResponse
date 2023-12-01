@@ -20,6 +20,7 @@ const octokit = new Octokit({
 });
 
 module.exports = (app: Probot) => {
+
     app.on("push", async (context): Promise<void> => {
         await new Push(context).push();
     });
@@ -100,11 +101,14 @@ module.exports = (app: Probot) => {
             return;
         }
     });
+
 };
 
 setInterval(() => {
     (async () => {
         await new PRsStale().checkStale();
+    })().catch((err: Error) => {
+        console.error(err);
     });
 }, 3600000);
 
