@@ -15,7 +15,7 @@ const octokit = new Octokit({
         privateKey: process.env.PRIVATE_KEY,
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        installationId: 21573969
+        installationId: 12345678 // env not working
     }
 });
 
@@ -93,7 +93,7 @@ module.exports = (app: Probot) => {
     app.on("workflow_run.completed", async (context): Promise<void> => {
         if (context.payload.workflow_run.event == "pull_request") {
             if (context.payload.sender.type == "User") {
-                await new WorkflowCheck(context).CheckUserCI();
+                await new WorkflowCheck(context).checkUserCI();
             } else {
                 await new WorkflowCheck(context).checkCI();
             }
