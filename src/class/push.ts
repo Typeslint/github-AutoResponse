@@ -116,7 +116,7 @@ export default class Push {
                         owner: "Muunatic",
                         repo: "Muunatic",
                         name: "typeslint/ci",
-                        head_sha: this.context.payload.head_commit?.id,
+                        head_sha: this.context.payload.head_commit?.id as string,
                         status: "in_progress"
                     }).then(async (resId) => {
                         await octokit.rest.checks.update({
@@ -140,4 +140,5 @@ export default class Push {
             }
         }
     }
+
 }
