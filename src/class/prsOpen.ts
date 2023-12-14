@@ -35,7 +35,7 @@ export default class PullRequestOpen {
         }).then(async (res) => {
             const filterFiles = res.data.filter((a) => a.filename !== "package.json" && a.filename !== "package-lock.json");
             for (let i = 0; i < filterFiles.length; i++) {
-                totalChanges += filterFiles[i].additions;
+                totalChanges += filterFiles[i].changes;
             }
 
             if (totalChanges > 1000) {
@@ -77,9 +77,6 @@ export default class PullRequestOpen {
                     continue;
                 }
             }
-
-            console.log(fileLabels);
-            console.log(filteredlabels);
 
             if (fileLabels.length > 0) {
                 new Set(fileLabels).forEach(a => filteredlabels.push(a));
@@ -181,4 +178,5 @@ export default class PullRequestOpen {
             });
         });
     }
+
 }
