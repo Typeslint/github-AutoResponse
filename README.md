@@ -1,33 +1,27 @@
-# GitHub-AutoResponse
+# github-AutoResponse
+This GitHub Automaton is a Probot-based application that automates various actions and responses to different events within a GitHub repository. It utilizes Probot, Octokit, and various event listeners to handle actions such as closing issues, commenting on issues and pull requests, managing pull requests, and performing checks on workflow runs.
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) framework
+## Features
+- Push Event Handling: Responds to push events in the repository.
+- Issues Management: Handles opening, closing, and commenting on issues.
+- Pull Request Management: Manages opening, reviewing, and synchronizing pull requests.
+- Workflow Run Handling: Performs checks based on workflow run completion events.
+- Stale Pull Requests: Regularly checks for stale pull requests.
 
-## Setup
+## Configuration
+Environment Variables
+To use this application, set the following environment variables in a .env file:
 
-```sh
-# Install dependencies
-npm install
+APP_ID: Your GitHub App's ID.
+PRIVATE_KEY: Your GitHub App's private key.
+CLIENT_ID: Your GitHub App's client ID.
+CLIENT_SECRET: Your GitHub App's client secret.
 
-# Run the client
-npm start
-```
-
-## Docker
-
-```sh
-# 1. Build container
-docker build -t my-first-app .
-
-# 2. Start container
-docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> my-first-app
-```
+## Usage
+To use this application, install the dependencies and configure the environment variables. Run the application using the appropriate command `npm run build:start`.
 
 ## Contributing
-
-If you have suggestions for GitHub-AutoResponse could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
-
-For more, check out the [Contributing Guide](CONTRIBUTING.md).
+Contributions are welcome! Please see this <a href="https://github.com/Typeslint/github-AutoResponse/blob/main/CONTRIBUTING.md">**Contribution Guide**</a> and adhere to <a href="https://github.com/Typeslint/github-AutoResponse/blob/main/CODE_OF_CONDUCT.md">**Code Of Conduct**</a>. If you have any improvements, feel free to submit a pull request.
 
 ## License
-
-[ISC](LICENSE) © 2021 Typeslint
+This project is licensed under the MIT License.
