@@ -27,16 +27,20 @@ export default class IssuesOpen {
      * @returns {Promise<void>}
      */
     public async open(): Promise<void> {
-        if (this.context.payload.sender.login === "Muunatic") return;
-        const issueComment = this.context.issue({
-            body: `Hello @${this.context.payload.sender.login} Thank you for submitting Issue, please wait for next notification after we review your Issue.`
-        });
-        console.log("Issues created");
-        await this.context.octokit.issues.addLabels(
-            this.context.issue({
-                labels: ["Pending"]
-            })
-        );
-        await this.context.octokit.issues.createComment(issueComment);
+        if (this.context.payload.sender.login !== "Muunatic") {
+            const issueComment = this.context.issue({
+                body: `Hello @${this.context.payload.sender.login} Thank you for submitting Issue, please wait for next notification after we review your Issue.`
+            });
+            console.log("Issues created");
+            await this.context.octokit.issues.addLabels(
+                this.context.issue({
+                    labels: ["Pending"]
+                })
+            );
+            await this.context.octokit.issues.createComment(issueComment);
+        } else {
+            return;
+        }
     }
+
 }
