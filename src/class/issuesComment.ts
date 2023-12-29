@@ -189,4 +189,5 @@ export default class IssuesComment {
             }
         }
     }
+
 }

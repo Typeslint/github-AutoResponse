@@ -6,6 +6,7 @@ import { octokit } from "../index";
  * @exports
  */
 export default class PRsStale {
+
     /**
      * @constructor
      */
@@ -137,4 +138,5 @@ export default class PRsStale {
             }
         });
     }
+
 }

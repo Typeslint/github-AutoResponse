@@ -69,7 +69,8 @@ export default class IssuesClose {
             owner: this.context.payload.repository.owner.login,
             repo: this.context.payload.repository.name,
             issue_number: this.context.payload.issue.number,
-            lock_reason: "spam"
+            lock_reason: "off-topic"
         });
     }
+
 }
