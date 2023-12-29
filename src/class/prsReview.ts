@@ -482,4 +482,5 @@ export default class PullRequestReview {
             }
         }
     }
+
 }

@@ -146,4 +146,5 @@ export default class PullRequestSynchronize {
             });
         });
     }
+
 }

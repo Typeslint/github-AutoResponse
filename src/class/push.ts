@@ -78,11 +78,7 @@ export default class Push {
                         continue;
                     }
                 }
-                event1 = arrayActivity.userData[0].event;
-                event2 = arrayActivity.userData[1].event;
-                event3 = arrayActivity.userData[2].event;
-                event4 = arrayActivity.userData[3].event;
-                event5 = arrayActivity.userData[4].event;
+                event1 = arrayActivity.userData[0].event, event2 = arrayActivity.userData[1].event, event3 = arrayActivity.userData[2].event, event4 = arrayActivity.userData[3].event, event5 = arrayActivity.userData[4].event;
                 return;
             });
         }

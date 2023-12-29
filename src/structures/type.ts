@@ -6,7 +6,6 @@ type userDataInterface = {
     event: string;
 }
 
-
 export type getEvent = {
     id: string;
     type: string;
