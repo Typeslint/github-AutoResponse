@@ -29,6 +29,8 @@
             "before": false
         }],
         "comma-style": ["warn", "last"],
+        "curly": ["error", "all"],
+        "default-case": 1,
         "eol-last": ["warn", "always"],
         "indent": ["warn", 4, {
             "SwitchCase": 1
@@ -39,6 +41,11 @@
         "keyword-spacing": ["warn", {
             "after": true,
             "before": true
+        }],
+        "lines-between-class-members": ["warn", "always"],
+        "no-multi-spaces": 1,
+        "no-multiple-empty-lines": ["warn", { 
+            "max": 1
         }],
         "no-trailing-spaces": 1,
         "no-unused-vars": 1,
@@ -71,7 +78,8 @@
             "multilineDetection": "brackets"
         }],
         "@typescript-eslint/no-unnecessary-condition": 2,
-        "@typescript-eslint/no-var-requires": 0
+        "@typescript-eslint/no-require-imports": 2,
+        "@typescript-eslint/no-var-requires": 1
     },
     "ignorePatterns": ["dist/*.js", "dist/**/*.js"]
 }
