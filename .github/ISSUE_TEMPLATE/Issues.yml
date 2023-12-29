@@ -1,0 +1,50 @@
+name: "Bug Report"
+description: "Report a bug encountered while using the project."
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Welcome to the issue tracker!
+
+        Before submitting your issue, please make sure to provide as much relevant information as possible. 
+
+  - type: input
+    attributes:
+      label: Issue Description
+      description: Provide a brief description of the issue you are facing.
+
+  - type: input
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+
+  - type: input
+    attributes:
+      label: Actual Behavior
+      description: What is happening instead?
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Describe the steps required to reproduce the issue, including code snippets, if relevant.
+
+  - type: input
+    attributes:
+      label: NodeJS Environment
+      description: NodeJS Version
+
+  - type: input
+    attributes:
+      label: Package Manager
+      description: NPM Version
+
+  - type: dropdown
+    attributes:
+      label: Operating System
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
