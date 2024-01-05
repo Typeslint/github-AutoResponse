@@ -1,39 +1,60 @@
-## Contributing
+# Contribution Guide
 
-[fork]: /fork
-[pr]: /compare
-[code-of-conduct]: CODE_OF_CONDUCT.md
+Welcome to the contribution guide! I appreciate your interest in contributing to github-AutoResponse project. This guide will provide you with the necessary information and guidelines to make your contributions valuable and effective.
 
-Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
+### 1. Getting started
 
-Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating in this project you agree to abide by its terms.
+Contributions can come in various forms, including bug fixes, refactoring the code, documentation improvements, and more. Here are some ways you can contribute to the repository:
 
-## Issues and PRs
+- Fix bugs and address issues.
+- Refactor code for better maintainability.
+- Improve the documentation.
 
-If you have suggestions for how this project could be improved, or want to report a bug, open an issue! We'd love all and any contributions. If you have questions, too, we'd love to hear them.
+If you're unsure about what to work on, you can check the repository's issue tracker for any open issues.
 
-We'd also love PRs. If you're thinking of a large PR, we advise opening up an issue first to talk about it, though! Look at the links below if you're not sure how to open a PR.
+### 2. Code Style and Guidelines
 
-## Submitting a pull request
+To maintain a consistent codebase, this project follow certain code style and guidelines. Please adhere to the following conventions when contributing code:
 
-1. [Fork][fork] and clone the repository.
-1. Configure and install the dependencies: `npm install`.
-1. Make sure the tests pass on your machine: `npm test`, note: these tests also apply the linter, so there's no need to lint separately.
-1. Create a new branch: `git checkout -b my-branch-name`.
-1. Make your change, add tests, and make sure the tests still pass.
-1. Push to your fork and [submit a pull request][pr].
-1. Pat your self on the back and wait for your pull request to be reviewed and merged.
+- Follow the code standard and writing style from ESLint config.
+- Use camelcase for variable, function, etc.
+- Write clear and concise comments when necessary (will remove after merging).
 
-Here are a few things you can do that will increase the likelihood of your pull request being accepted:
+### 3. Running the Linter
 
-- Write and update tests.
-- Keep your changes as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
-- Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+This repository have a linter set up for the project to ensure consistent code style and catch potential issues. Before opening a pull request, please run the following command to execute the linter and fix any reported issues:
 
-Work in Progress pull requests are also welcome to get feedback early on, or if there is something blocked you.
+```
+npm run lint
+```
 
-## Resources
+Make sure the linter passes without any errors or warnings before proceeding with your pull request. This step ensures that the codebase remains clean and consistent.
 
-- [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
-- [Using Pull Requests](https://help.github.com/articles/about-pull-requests/)
-- [GitHub Help](https://help.github.com)
+### 4. Using Conventional Commits
+
+To have a consistent commit message format across the repository, we follow the Conventional Commits specification. Please use the following format for your commit messages:
+
+```
+<type>[optional scope]: <description>
+```
+
+Here's an example of a conventional commit message:
+
+```
+feat(core): add issue_comment.created event
+```
+
+For more information about the Conventional Commits specification, you can refer to [conventionalcommits.org](https://conventionalcommits.org).
+
+### 5. Avoiding Copyright Infringement
+
+When contributing code or any other content, it's important to ensure that your contributions are your own original creation and do not violate any copyright laws or infringe upon the intellectual property rights of others. By contributing to this repository, you agree to the following:
+
+- You warrant that the contribution is your original work.
+- You agree to grant the repository maintainers and users a license to use your contributions under the repository's designated license. [LICENSE](https://github.com/Typeslint/github-AutoResponse/blob/main/LICENSE)
+
+Please refrain from including any code, documentation, or other content in your contributions that may have been copied or derived from copyrighted sources without the necessary permissions or licenses.
+
+### 6. LICENSE
+
+By contributing to this repository, you agree that your contributions will be licensed under the same license as the repository itself. Please refer to the repository's [LICENSE](https://github.com/Typeslint/github-AutoResponse/blob/main/LICENSE) file for more details.
