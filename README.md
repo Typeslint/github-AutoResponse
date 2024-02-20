@@ -12,10 +12,10 @@ This GitHub Automaton is a Probot-based application that automates various actio
 Environment Variables
 To use this application, set the following environment variables in a .env file:
 
-APP_ID: Your GitHub App's ID.
-PRIVATE_KEY: Your GitHub App's private key.
-CLIENT_ID: Your GitHub App's client ID.
-CLIENT_SECRET: Your GitHub App's client secret.
+- APP_ID: Your GitHub App's ID.
+- PRIVATE_KEY: Your GitHub App's private key.
+- CLIENT_ID: Your GitHub App's client ID.
+- CLIENT_SECRET: Your GitHub App's client secret.
 
 ## Usage
 To use this application, install the dependencies and configure the environment variables. Run the application using the appropriate command `npm run build:start`.
@@ -24,4 +24,4 @@ To use this application, install the dependencies and configure the environment 
 Contributions are welcome! Please see this <a href="https://github.com/Typeslint/github-AutoResponse/blob/main/CONTRIBUTING.md">**Contribution Guide**</a> and adhere to <a href="https://github.com/Typeslint/github-AutoResponse/blob/main/CODE_OF_CONDUCT.md">**Code Of Conduct**</a>. If you have any improvements, feel free to submit a pull request.
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the ISC License.
