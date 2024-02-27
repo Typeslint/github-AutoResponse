@@ -2,9 +2,9 @@ name: Run TypeScript Compiler
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ development ]
   pull_request:
-    branches: [ develop ]
+    branches: [ development ]
 
 jobs:
   lint:
