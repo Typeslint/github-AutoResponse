@@ -7,7 +7,7 @@ on:
     branches: [ development ]
 
 jobs:
-  lint:
+  build:
     runs-on: windows-latest
     strategy:
       matrix:
