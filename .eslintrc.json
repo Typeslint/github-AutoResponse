@@ -18,6 +18,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "arrow-parens": ["warn", "always"],
         "brace-style": ["warn", "1tbs"],
         "camelcase": ["warn", {
             "properties": "never",

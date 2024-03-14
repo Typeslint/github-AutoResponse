@@ -37,7 +37,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} your pull request has been approved by @${this.context.payload.review.user.login}, please type \`Ready to merge\` for merging`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Requested Changes"
@@ -76,7 +76,7 @@ export default class PullRequestReview {
                     body: `Pull request has requested changes by @${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Approved"
@@ -117,7 +117,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} your pull request has been approved by \`[MAINTAINER]\`@${this.context.payload.review.user.login}, please type \`Ready to merge\` for merging`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Requested Changes"
@@ -156,7 +156,7 @@ export default class PullRequestReview {
                     body: `Pull request has requested changes by @${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Approved"
@@ -198,7 +198,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} your pull request has been approved by @${this.context.payload.review.user.login}, even though please wait for the \`MAINTAINERS\`/\`CODEOWNERS\` to review`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Requested Changes"
@@ -268,7 +268,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} Pull request has been approved by \`[OWNER]\`@${this.context.payload.review.user.login}, please type \`Merge\` for merging @${this.context.payload.review.user.login}`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Requested Changes"
@@ -307,7 +307,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} your pull request has requested changes by \`[OWNER]\`@${this.context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Approved"
@@ -348,7 +348,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} Pull request has been approved by \`[MAINTAINER]\`@${this.context.payload.review.user.login}, please type \`Merge\` for merging @${this.context.payload.review.user.login}`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Requested Changes"
@@ -387,7 +387,7 @@ export default class PullRequestReview {
                     body: `Pull request has requested changes by \`[MAINTAINER]\`@${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I"m merging this PR, thanks!`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Approved"
@@ -429,7 +429,7 @@ export default class PullRequestReview {
                     body: `@${this.context.payload.pull_request.user.login} your pull request has been approved by @${this.context.payload.review.user.login}, even though please wait for the \`MAINTAINERS\`/\`CODEOWNERS\` to review`,
                     event: "COMMENT"
                 });
-                if (this.context.payload.pull_request.labels.find(a => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
                     await this.context.octokit.issues.removeLabel(
                         this.context.issue({
                             name: "Requested Changes"

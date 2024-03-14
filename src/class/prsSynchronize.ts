@@ -33,7 +33,7 @@ export default class PullRequestSynchronize {
             issue_number: this.context.payload.pull_request.number
         }).then(async (res) => {
             let i: number;
-            const prsLabels = res.data.find(a => a.name == "Requested Changes" || a.name == "Approved")?.name;
+            const prsLabels = res.data.find((a) => a.name == "Requested Changes" || a.name == "Approved")?.name;
             if (prsLabels) {
                 await this.context.octokit.pulls.listReviews({
                     owner: this.context.payload.repository.owner.login,
@@ -48,8 +48,8 @@ export default class PullRequestSynchronize {
                                 "CHANGES_REQUESTED",
                                 "APPROVED"
                             ];
-                            if (res.data[i].state == datastate.find(a => a == res.data[i].state)) {
-                                if (res.data[i].user?.login != reviewersArray.find(a => a == res.data[i].user?.login)) {
+                            if (res.data[i].state == datastate.find((a) => a == res.data[i].state)) {
+                                if (res.data[i].user?.login != reviewersArray.find((a) => a == res.data[i].user?.login)) {
                                     const username: string = res.data[i].user?.login || "";
                                     reviewersArray.push(username);
                                     tagReviewers.push("@" + username);
@@ -124,7 +124,7 @@ export default class PullRequestSynchronize {
                             repo: this.context.payload.repository.name,
                             issue_number: this.context.payload.pull_request.number
                         }).then(async (res) => {
-                            if (res.data.find(a => a.name == "Config Invalid")) {
+                            if (res.data.find((a) => a.name == "Config Invalid")) {
                                 await this.context.octokit.issues.removeLabel(
                                     this.context.issue({
                                         name: "Config Invalid"

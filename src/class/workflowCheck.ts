@@ -68,7 +68,7 @@ export default class WorkflowCheck {
                     repo: this.context.payload.repository.name,
                     pull_number: prsNumber
                 }).then(async (res) => {
-                    if (res.data.labels.find(a => a.name == "CI Failed")) {
+                    if (res.data.labels.find((a) => a.name == "CI Failed")) {
                         await this.context.octokit.issues.removeLabel(
                             this.context.issue({
                                 owner: this.context.payload.repository.owner.login,
