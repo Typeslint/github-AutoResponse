@@ -6,7 +6,6 @@ import Context from "../index";
  * @exports
  */
 export default class PullRequestReview {
-
     /**
      * @private
      * @type Context<"pull_request_review.submitted">
@@ -34,7 +33,7 @@ export default class PullRequestReview {
             repo: this.context.payload.repository.name,
             owner: this.context.payload.repository.owner.login,
             pull_number: this.context.payload.pull_request.number,
-            body,
+            body: body,
             event: "COMMENT"
         });
 
@@ -45,13 +44,21 @@ export default class PullRequestReview {
         );
 
         if (removeLabel) {
-            for (let i = 0; i < removeLabel.length; i++) {
-                await this.context.octokit.issues.removeLabel(
-                    this.context.issue({
-                        name: removeLabel[i]
-                    })
-                );
-            }
+            removeLabel.forEach((label) => {
+                new Promise<void>((resolve, reject) => {
+                    this.context.octokit.issues.removeLabel(
+                        this.context.issue({
+                            name: label
+                        })
+                    ).then(() => {
+                        resolve();
+                    }).catch((err) => {
+                        reject(err);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                });
+            });
         }
     }
 
@@ -172,5 +179,4 @@ export default class PullRequestReview {
             }
         }
     }
-
 }
