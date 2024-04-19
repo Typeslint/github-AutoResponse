@@ -33,7 +33,7 @@ export default class PullRequestSynchronize {
             issue_number: this.context.payload.pull_request.number
         }).then(async (res) => {
             let i: number;
-            const prsLabels = res.data.find((a) => a.name == "Requested Changes" || a.name == "Approved")?.name;
+            const prsLabels = res.data.find((a) => a.name === "Requested Changes" || a.name === "Approved")?.name;
             if (prsLabels) {
                 await this.context.octokit.pulls.listReviews({
                     owner: this.context.payload.repository.owner.login,
@@ -43,13 +43,13 @@ export default class PullRequestSynchronize {
                     const reviewersArray: string[] = [];
                     const tagReviewers: string[] = [];
                     for (i = 0; i < res.data.length; i++) {
-                        if (res.data[i].user?.type == "User") {
+                        if (res.data[i].user?.type === "User") {
                             const datastate: string[] = [
                                 "CHANGES_REQUESTED",
                                 "APPROVED"
                             ];
-                            if (res.data[i].state == datastate.find((a) => a == res.data[i].state)) {
-                                if (res.data[i].user?.login != reviewersArray.find((a) => a == res.data[i].user?.login)) {
+                            if (res.data[i].state === datastate.find((a) => a === res.data[i].state)) {
+                                if (res.data[i].user?.login !== reviewersArray.find((a) => a === res.data[i].user?.login)) {
                                     const username: string = res.data[i].user?.login || "";
                                     reviewersArray.push(username);
                                     tagReviewers.push("@" + username);
@@ -76,19 +76,28 @@ export default class PullRequestSynchronize {
                             continue;
                         }
                     }
-                    await this.context.octokit.issues.createComment(
-                        this.context.issue({
-                            owner: this.context.payload.repository.owner.login,
-                            repo: this.context.payload.repository.name,
-                            issue_number: this.context.payload.pull_request.number,
-                            body: `PING! ${tagReviewers.join(", ")}. The author has pushed new commits since your last review. please review @${this.context.payload.sender.login} new commit before merge, thanks!`
-                        })
-                    );
-                    await this.context.octokit.issues.removeLabel(
-                        this.context.issue({
-                            name: prsLabels
-                        })
-                    );
+                    if (this.context.payload.sender.login === this.context.payload.pull_request.user.login) {
+                        await this.context.octokit.issues.createComment(
+                            this.context.issue({
+                                owner: this.context.payload.repository.owner.login,
+                                repo: this.context.payload.repository.name,
+                                issue_number: this.context.payload.pull_request.number,
+                                body: `PING! ${tagReviewers.join(", ")}. The author has pushed new commits since your last review. please review @${this.context.payload.sender.login} new commit before merge, thanks!`
+                            })
+                        );
+                        await this.context.octokit.issues.removeLabel(
+                            this.context.issue({
+                                name: prsLabels
+                            })
+                        );
+                    } else {
+                        await this.context.octokit.issues.removeLabel(
+                            this.context.issue({
+                                name: prsLabels
+                            })
+                        );
+                        return;
+                    }
                 });
             } else {
                 return;
@@ -124,7 +133,7 @@ export default class PullRequestSynchronize {
                             repo: this.context.payload.repository.name,
                             issue_number: this.context.payload.pull_request.number
                         }).then(async (res) => {
-                            if (res.data.find((a) => a.name == "Config Invalid")) {
+                            if (res.data.find((a) => a.name === "Config Invalid")) {
                                 await this.context.octokit.issues.removeLabel(
                                     this.context.issue({
                                         name: "Config Invalid"
