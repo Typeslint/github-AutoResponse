@@ -30,7 +30,7 @@ module.exports = (app: Probot) => {
     });
 
     app.on("issue_comment.created", async (context): Promise<void> => {
-        if (context.payload.comment.user.type == "User") {
+        if (context.payload.comment.user.type === "User") {
             switch (context.payload.issue.user.type) {
                 case "User":
                     await new IssuesComment(context).userPRsComment();
@@ -45,7 +45,7 @@ module.exports = (app: Probot) => {
     });
 
     app.on("issues.closed", async (context): Promise<void> => {
-        if (context.payload.issue.state_reason == "not_planned") {
+        if (context.payload.issue.state_reason === "not_planned") {
             await new IssuesClose(context).invalid();
         } else {
             await new IssuesClose(context).closed();
@@ -53,8 +53,8 @@ module.exports = (app: Probot) => {
     });
 
     app.on("pull_request.opened", async (context): Promise<void> => {
-        if (context.payload.sender.type == "User") {
-            if (context.payload.repository.html_url == "https://github.com/Typeslint/github-AutoResponse") {
+        if (context.payload.sender.type === "User") {
+            if (context.payload.repository.html_url === "https://github.com/Typeslint/github-AutoResponse") {
                 await new PullRequestOpen(context).openCore();
             } else {
                 await new PullRequestOpen(context).open();
@@ -65,7 +65,7 @@ module.exports = (app: Probot) => {
     });
 
     app.on("pull_request_review.submitted", async (context): Promise<void> => {
-        if (context.payload.sender.type == "User") {
+        if (context.payload.sender.type === "User") {
             switch (context.payload.pull_request.user.type) {
                 case "User":
                     await new PullRequestReview(context).userPRs();
@@ -80,8 +80,8 @@ module.exports = (app: Probot) => {
     });
 
     app.on("pull_request.synchronize", async (context): Promise<void> => {
-        if (context.payload.pull_request.user.type == "User") {
-            if (context.payload.repository.homepage == "https://github.com/Typeslint/github-AutoResponse") {
+        if (context.payload.pull_request.user.type === "User") {
+            if (context.payload.repository.homepage === "https://github.com/Typeslint/github-AutoResponse") {
                 await new PullRequestSynchronize(context).synchronizeCore();
             }
             await new PullRequestSynchronize(context).sync();
@@ -91,8 +91,8 @@ module.exports = (app: Probot) => {
     });
 
     app.on("workflow_run.completed", async (context): Promise<void> => {
-        if (context.payload.workflow_run.event == "pull_request") {
-            if (context.payload.sender.type == "User") {
+        if (context.payload.workflow_run.event === "pull_request") {
+            if (context.payload.sender.type === "User") {
                 await new WorkflowCheck(context).checkUserCI();
             } else {
                 await new WorkflowCheck(context).checkCI();

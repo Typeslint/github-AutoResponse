@@ -34,8 +34,8 @@ export default class PRsStale {
                             const currentRepo = res.data[i].base.repo.name;
                             const currentOwner = res.data[i].base.repo.owner.login;
                             const currentPRs = res.data[i].number;
-                            if (res.data[i].state.toLowerCase() == "open" && res.data[i].draft == false) {
-                                if (res.data[i].user?.type.toLowerCase() == "user") {
+                            if (res.data[i].state.toLowerCase() === "open" && res.data[i].draft === false) {
+                                if (res.data[i].user?.type.toLowerCase() === "user") {
                                     await octokit.rest.pulls.listCommits({
                                         owner: currentOwner,
                                         repo: currentRepo,
@@ -53,7 +53,7 @@ export default class PRsStale {
                                                     pull_number: currentPRs,
                                                     state: "closed"
                                                 }).then(async (res) => {
-                                                    if (res.data.labels.find((a) => a.name == "Stale")) {
+                                                    if (res.data.labels.find((a) => a.name === "Stale")) {
                                                         await octokit.rest.issues.addLabels({
                                                             owner: res.data.base.repo.owner.login,
                                                             repo: res.data.base.repo.name,
@@ -88,7 +88,7 @@ export default class PRsStale {
                                                     repo: currentRepo,
                                                     pull_number: currentPRs
                                                 }).then(async (res) => {
-                                                    if (res.data.labels.find((a) => a.name == "Stale")) {
+                                                    if (res.data.labels.find((a) => a.name === "Stale")) {
                                                         return;
                                                     } else {
                                                         const prsReviewers: string[] = [];

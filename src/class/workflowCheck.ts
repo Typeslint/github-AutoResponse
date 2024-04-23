@@ -27,7 +27,7 @@ export default class WorkflowCheck {
      * @returns {Promise<void>}
      */
     public async checkCI(): Promise<void> {
-        if (this.context.payload.workflow_run.conclusion == "failure") {
+        if (this.context.payload.workflow_run.conclusion === "failure") {
             await this.context.octokit.issues.addLabels(
                 this.context.issue({
                     owner: this.context.payload.repository.owner.login,
@@ -62,13 +62,13 @@ export default class WorkflowCheck {
             state: "open"
         }).then(async (res) => {
             const prsNumber = res.data.find((a) => a.head.sha === this.context.payload.workflow_run.head_sha)?.number as number;
-            if (this.context.payload.workflow_run.conclusion == "success") {
+            if (this.context.payload.workflow_run.conclusion === "success") {
                 await this.context.octokit.pulls.get({
                     owner: this.context.payload.repository.owner.login,
                     repo: this.context.payload.repository.name,
                     pull_number: prsNumber
                 }).then(async (res) => {
-                    if (res.data.labels.find((a) => a.name == "CI Failed")) {
+                    if (res.data.labels.find((a) => a.name === "CI Failed")) {
                         await this.context.octokit.issues.removeLabel(
                             this.context.issue({
                                 owner: this.context.payload.repository.owner.login,
@@ -82,7 +82,7 @@ export default class WorkflowCheck {
                         return;
                     }
                 });
-            } else if (this.context.payload.workflow_run.conclusion == "failure") {
+            } else if (this.context.payload.workflow_run.conclusion === "failure") {
                 console.log("CI Failure!");
                 await this.context.octokit.issues.addLabels(
                     this.context.issue({
