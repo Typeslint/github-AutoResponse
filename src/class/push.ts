@@ -47,11 +47,11 @@ export default class Push {
             }).then((res: [getEvent]) => {
                 let i: number;
                 for (i = 0; i < res.length; i++) {
-                    if (res[i].type == "PushEvent") {
+                    if (res[i].type === "PushEvent") {
                         if (arrayActivity.userData.length < 5) {
                             let commitsI: number;
                             for (commitsI = 0; commitsI < res[i].payload.commits.length; commitsI++) {
-                                if (res[i].payload.commits[commitsI].author.name == "Muunatic") {
+                                if (res[i].payload.commits[commitsI].author.name === "Muunatic") {
                                     if (arrayActivity.userData.length < 5) {
                                         arrayActivity.userData.push({ event: `Commit on [${res[i].payload.commits[commitsI].sha.slice(0, 7)}](https://github.com/${res[i].repo.name}/commit/${res[i].payload.commits[commitsI].sha}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})` });
                                     } else {
@@ -64,9 +64,9 @@ export default class Push {
                         } else {
                             break;
                         }
-                    } else if (res[i].type == "PullRequestEvent") {
+                    } else if (res[i].type === "PullRequestEvent") {
                         if (arrayActivity.userData.length < 5) {
-                            if (res[i].payload.pull_request.user.login == "Muunatic") {
+                            if (res[i].payload.pull_request.user.login === "Muunatic") {
                                 arrayActivity.userData.push({ event: `Pull Request on [\#${res[i].payload.pull_request.number.toString()}](https://github.com/${res[i].repo.name}/pull/${res[i].payload.pull_request.number}) in [${res[i].repo.name}](https://github.com/${res[i].repo.name})` });
                             } else {
                                 continue;
@@ -82,8 +82,8 @@ export default class Push {
                 return;
             });
         }
-        if (this.context.payload.repository.owner.login == "Muunatic") {
-            if (this.context.payload.sender.login == "Muunatic") {
+        if (this.context.payload.repository.owner.login === "Muunatic") {
+            if (this.context.payload.sender.login === "Muunatic") {
                 await userActivity();
                 await this.context.octokit.repos.getContent({
                     owner: "Muunatic",
@@ -106,8 +106,8 @@ export default class Push {
                         return;
                     }
                 });
-            } else if (this.context.payload.sender.login == "typeslint-cli[bot]") {
-                if (this.context.payload.repository.name == "Muunatic") {
+            } else if (this.context.payload.sender.login === "typeslint-cli[bot]") {
+                if (this.context.payload.repository.name === "Muunatic") {
                     await octokit.rest.checks.create({
                         owner: "Muunatic",
                         repo: "Muunatic",

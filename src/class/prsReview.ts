@@ -68,34 +68,34 @@ export default class PullRequestReview {
      * @returns {Promise<void>}
      */
     public async userPRs(): Promise<void> {
-        if (this.context.payload.sender.login == this.context.payload.repository.owner.login) {
+        if (this.context.payload.sender.login === this.context.payload.repository.owner.login) {
             // Owner
-            if (this.context.payload.review.state == "approved") {
+            if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} your pull request has been approved by @${this.context.payload.review.user.login}, please type \`Ready to merge\` for merging`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
                     await this.createReview(reviewMessage, ["Approved"], ["Requested Changes", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Approved"], ["Pending"]);
                 }
-            } else if (this.context.payload.review.state == "changes_requested") {
+            } else if (this.context.payload.review.state === "changes_requested") {
                 const reviewMessage = `Pull request has requested changes by @${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Approved")) {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Approved", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
                 }
             }
-        } else if (this.context.payload.pull_request.author_association == "MEMBER" || this.context.payload.pull_request.author_association == "COLLABORATOR") {
-            if (this.context.payload.review.state == "approved") {
+        } else if (this.context.payload.pull_request.author_association === "MEMBER" || this.context.payload.pull_request.author_association === "COLLABORATOR") {
+            if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} your pull request has been approved by \`[MAINTAINER]\`@${this.context.payload.review.user.login}, please type \`Ready to merge\` for merging`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
                     await this.createReview(reviewMessage, ["Approved"], ["Requested Changes", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Approved"], ["Pending"]);
                 }
-            } else if (this.context.payload.review.state == "changes_requested") {
+            } else if (this.context.payload.review.state === "changes_requested") {
                 const reviewMessage = `Pull request has requested changes by @${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Approved")) {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Approved", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
@@ -103,16 +103,16 @@ export default class PullRequestReview {
             }
         } else {
             // Others Approved
-            if (this.context.payload.review.state == "approved") {
+            if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} your pull request has been approved by @${this.context.payload.review.user.login}, even though please wait for the \`MAINTAINERS\`/\`CODEOWNERS\` to review`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
                     await this.createReview(reviewMessage, ["Others Approved"], ["Requested Changes", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Others Approved"], ["Pending"]);
                 }
-            } else if (this.context.payload.review.state == "changes_requested") {
+            } else if (this.context.payload.review.state === "changes_requested") {
                 const reviewMessage = `Pull request has requested changes by @${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Others Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Others Approved")) {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Others Approved", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
@@ -127,34 +127,34 @@ export default class PullRequestReview {
      * @returns {Promise<void>}
      */
     public async botPRs(): Promise<void> {
-        if (this.context.payload.sender.login == this.context.payload.repository.owner.login) {
+        if (this.context.payload.sender.login === this.context.payload.repository.owner.login) {
             // Owner
-            if (this.context.payload.review.state == "approved") {
+            if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} Pull request has been approved by \`[OWNER]\`@${this.context.payload.review.user.login}, please type \`Merge\` for merging @${this.context.payload.review.user.login}`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
                     await this.createReview(reviewMessage, ["Approved"], ["Requested Changes", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Approved"], ["Pending"]);
                 }
-            } else if (this.context.payload.review.state == "changes_requested") {
+            } else if (this.context.payload.review.state === "changes_requested") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} your pull request has requested changes by \`[OWNER]\`@${this.context.payload.review.user.login}. Please address their comments before I'm merging this PR, thanks!`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Approved")) {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Approved", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
                 }
             }
-        } else if (this.context.payload.pull_request.author_association == "MEMBER" || this.context.payload.pull_request.author_association == "COLLABORATOR") {
-            if (this.context.payload.review.state == "approved") {
+        } else if (this.context.payload.pull_request.author_association === "MEMBER" || this.context.payload.pull_request.author_association === "COLLABORATOR") {
+            if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} Pull request has been approved by \`[MAINTAINER]\`@${this.context.payload.review.user.login}, please type \`Merge\` for merging @${this.context.payload.review.user.login}`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
                     await this.createReview(reviewMessage, ["Approved"], ["Requested Changes", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Approved"], ["Pending"]);
                 }
-            } else if (this.context.payload.review.state == "changes_requested") {
+            } else if (this.context.payload.review.state === "changes_requested") {
                 const reviewMessage = `Pull request has requested changes by \`[MAINTAINER]\`@${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I"m merging this PR, thanks!`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Approved")) {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Approved", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
@@ -162,16 +162,16 @@ export default class PullRequestReview {
             }
         } else {
             // Others Approved
-            if (this.context.payload.review.state == "approved") {
+            if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} your pull request has been approved by @${this.context.payload.review.user.login}, even though please wait for the \`MAINTAINERS\`/\`CODEOWNERS\` to review`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Requested Changes")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
                     await this.createReview(reviewMessage, ["Others Approved"], ["Requested Changes", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Others Approved"], ["Pending"]);
                 }
-            } else if (this.context.payload.review.state == "changes_requested") {
+            } else if (this.context.payload.review.state === "changes_requested") {
                 const reviewMessage = `Pull request has requested changes by @${this.context.payload.review.user.login}. PING! @${this.context.payload.pull_request.user.login} Please address their comments before I'm merging this PR, thanks!`;
-                if (this.context.payload.pull_request.labels.find((a) => a.name == "Others Approved")) {
+                if (this.context.payload.pull_request.labels.find((a) => a.name === "Others Approved")) {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Others Approved", "Pending"]);
                 } else {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);

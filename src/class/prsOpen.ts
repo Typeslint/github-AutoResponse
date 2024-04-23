@@ -98,7 +98,7 @@ export default class PullRequestOpen {
      */
     public async open(): Promise<void> {
 
-        if (this.context.payload.sender.login != this.context.payload.repository.owner.login) {
+        if (this.context.payload.sender.login !== this.context.payload.repository.owner.login) {
             const propened = this.context.issue({
                 body: `Hello @${this.context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
             });
