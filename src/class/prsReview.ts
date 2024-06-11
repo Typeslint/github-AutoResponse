@@ -85,7 +85,7 @@ export default class PullRequestReview {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
                 }
             }
-        } else if (this.context.payload.pull_request.author_association === "MEMBER" || this.context.payload.pull_request.author_association === "COLLABORATOR") {
+        } else if (this.context.payload.review.author_association === "MEMBER" || this.context.payload.review.author_association === "COLLABORATOR") {
             if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} your pull request has been approved by \`[MAINTAINER]\`@${this.context.payload.review.user.login}, please type \`Ready to merge\` for merging`;
                 if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
@@ -144,7 +144,7 @@ export default class PullRequestReview {
                     await this.createReview(reviewMessage, ["Requested Changes"], ["Pending"]);
                 }
             }
-        } else if (this.context.payload.pull_request.author_association === "MEMBER" || this.context.payload.pull_request.author_association === "COLLABORATOR") {
+        } else if (this.context.payload.review.author_association === "MEMBER" || this.context.payload.review.author_association === "COLLABORATOR") {
             if (this.context.payload.review.state === "approved") {
                 const reviewMessage = `@${this.context.payload.pull_request.user.login} Pull request has been approved by \`[MAINTAINER]\`@${this.context.payload.review.user.login}, please type \`Merge\` for merging @${this.context.payload.review.user.login}`;
                 if (this.context.payload.pull_request.labels.find((a) => a.name === "Requested Changes")) {
