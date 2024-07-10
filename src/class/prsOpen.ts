@@ -61,7 +61,7 @@ export default class PullRequestOpen {
             repo: "github-AutoResponse",
             pull_number: this.context.payload.number
         }).then(async (res) => {
-            const listFiles = res.data.map(a => a.filename);
+            const listFiles = res.data.map((a) => a.filename);
             for (let i = 0; i < listFiles.length; i++) {
                 if (/src\/index/i.test(listFiles[i])) {
                     fileLabels.push("Core");
@@ -79,7 +79,7 @@ export default class PullRequestOpen {
             }
 
             if (fileLabels.length > 0) {
-                new Set(fileLabels).forEach(a => filteredlabels.push(a));
+                new Set(fileLabels).forEach((a) => filteredlabels.push(a));
                 await this.context.octokit.issues.addLabels(
                     this.context.issue({
                         labels: filteredlabels
@@ -98,7 +98,7 @@ export default class PullRequestOpen {
      */
     public async open(): Promise<void> {
 
-        if (this.context.payload.sender.login != this.context.payload.repository.owner.login) {
+        if (this.context.payload.sender.login !== this.context.payload.repository.owner.login) {
             const propened = this.context.issue({
                 body: `Hello @${this.context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
             });

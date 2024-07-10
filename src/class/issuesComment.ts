@@ -27,17 +27,17 @@ export default class IssuesComment {
      * @returns {Promise<void>}
      */
     public async userPRsComment(): Promise<void> {
-        if (this.context.payload.comment.body.toLowerCase() == "ready to merge") {
+        if (this.context.payload.comment.body.toLowerCase() === "ready to merge") {
             await this.context.octokit.pulls.get({
                 repo: this.context.payload.repository.name,
                 owner: this.context.payload.repository.owner.login,
                 pull_number: this.context.payload.issue.number
             }).then(async (res) => {
-                if (res.data.mergeable_state.toLowerCase() == "clean" || res.data.mergeable == true) {
-                    if (this.context.payload.issue.user.login == this.context.payload.comment.user.login) {
+                if (res.data.mergeable_state.toLowerCase() === "clean" || res.data.mergeable === true) {
+                    if (this.context.payload.issue.user.login === this.context.payload.comment.user.login) {
                         let i: number;
                         for (i = 0; i < this.context.payload.issue.labels.length; i++) {
-                            if (this.context.payload.issue.labels[i].name == "Approved") {
+                            if (this.context.payload.issue.labels[i].name === "Approved") {
                                 console.log("Merging");
                                 await this.context.octokit.pulls.merge({
                                     repo: this.context.payload.repository.name,
@@ -53,7 +53,7 @@ export default class IssuesComment {
                                     })
                                 );
                                 break;
-                            } else if (this.context.payload.issue.labels[i].name == "Requested Changes") {
+                            } else if (this.context.payload.issue.labels[i].name === "Requested Changes") {
                                 console.log("PRs Blocked");
                                 await this.context.octokit.issues.createComment(
                                     this.context.issue({
@@ -68,7 +68,7 @@ export default class IssuesComment {
                     } else {
                         return;
                     }
-                } else if (res.data.mergeable_state.toLowerCase() == "dirty" || res.data.mergeable == false) {
+                } else if (res.data.mergeable_state.toLowerCase() === "dirty" || res.data.mergeable === false) {
                     await this.context.octokit.issues.createComment(
                         this.context.issue({
                             body: `Merging blocked because PRs has merge conflict! @${this.context.payload.comment.user.login}`
@@ -84,8 +84,8 @@ export default class IssuesComment {
             });
         }
 
-        if (this.context.payload.comment.body.toLowerCase() == "merge") {
-            if (this.context.payload.sender.login == this.context.payload.repository.owner.login) {
+        if (this.context.payload.comment.body.toLowerCase() === "merge") {
+            if (this.context.payload.sender.login === this.context.payload.repository.owner.login) {
                 await this.context.octokit.pulls.merge({
                     repo: this.context.payload.repository.name,
                     owner: this.context.payload.repository.owner.login,
@@ -140,8 +140,8 @@ export default class IssuesComment {
      * @returns {Promise<void>}
      */
     public async botPRsComment(): Promise<void> {
-        if (this.context.payload.comment.body.toLowerCase() == "merge") {
-            if (this.context.payload.sender.login == this.context.payload.repository.owner.login) {
+        if (this.context.payload.comment.body.toLowerCase() === "merge") {
+            if (this.context.payload.sender.login === this.context.payload.repository.owner.login) {
                 await this.context.octokit.pulls.merge({
                     repo: this.context.payload.repository.name,
                     owner: this.context.payload.repository.owner.login,

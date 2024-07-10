@@ -1,6 +1,6 @@
 {
   "name": "typeslint-cli",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "description": "GitHub Workflow Apps",
   "homepage": "https://typeslint.com/github-autoresponse",
@@ -15,18 +15,18 @@
     "lint:fix": "npx eslint src/**/*.ts --fix"
   },
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "octokit": "^3.1.2",
-    "probot": "^12.3.3",
-    "smee-client": "^2.0.0"
+    "dotenv": "^16.4.5",
+    "octokit": "^3.2.1",
+    "probot": "^12.4.0",
+    "smee-client": "^2.0.1"
   },
   "devDependencies": {
-    "@octokit/auth-app": "^6.0.2",
-    "@octokit/rest": "^20.0.2",
-    "@types/node": "^18.19.3",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
-    "eslint": "^8.56.0",
+    "@octokit/auth-app": "^6.1.1",
+    "@octokit/rest": "^20.1.1",
+    "@types/node": "^18.19.39",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
     "typescript": "5.3.3"
   },
   "engines": {
