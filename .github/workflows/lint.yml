@@ -21,6 +21,6 @@ jobs:
     - name: Install npm
       run: npm install npm@10.8.2 -g
     - name: Install dependencies
-      run: npm ci
+      run: npm i
     - name: Run lint
       run: npm run lint --if-present
