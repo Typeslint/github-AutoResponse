@@ -55,8 +55,8 @@ export default class PullRequestReview {
                     }).catch((err) => {
                         reject(err);
                     });
-                }).catch((err) => {
-                    console.error(err);
+                }).catch((err: Error) => {
+                    return reject(new Error(err.name));
                 });
             });
         }
