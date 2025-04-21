@@ -129,6 +129,8 @@ export default tseslint.config(
             "@typescript-eslint/no-require-imports": 2,
             "@typescript-eslint/no-var-requires": 1
         },
+    },
+    {
         ignores: [
             "node_modules",
             "dist"
