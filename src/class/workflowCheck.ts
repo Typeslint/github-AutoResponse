@@ -1,4 +1,4 @@
-import Context, { octokit } from "../index";
+import { Context, octokit } from "../index.js";
 
 /**
  * @class
@@ -11,14 +11,14 @@ export default class WorkflowCheck {
      * @private
      * @type Context<"workflow_run.completed">
      */
-    private context: Context<"workflow_run.completed">;
+    private _context: Context<"workflow_run.completed">;
 
     /**
      * @constructor
      * @param {Context<"workflow_run.completed">} context
      */
     constructor(context: Context<"workflow_run.completed">) {
-        this.context = context;
+        this._context = context;
     }
 
     /**
@@ -27,21 +27,21 @@ export default class WorkflowCheck {
      * @returns {Promise<void>}
      */
     public async checkCI(): Promise<void> {
-        if (this.context.payload.workflow_run.conclusion === "failure") {
-            await this.context.octokit.issues.addLabels(
-                this.context.issue({
-                    owner: this.context.payload.repository.owner.login,
-                    repo: this.context.payload.repository.name,
-                    issue_number: this.context.payload.workflow_run.pull_requests[0].number,
+        if (this._context.payload.workflow_run.conclusion === "failure") {
+            await this._context.octokit.issues.addLabels(
+                this._context.issue({
+                    owner: this._context.payload.repository.owner.login,
+                    repo: this._context.payload.repository.name,
+                    issue_number: this._context.payload.workflow_run.pull_requests[0].number,
                     labels: ["CI Failed"]
                 })
             );
-            await this.context.octokit.issues.createComment(
-                this.context.issue({
-                    owner: this.context.payload.repository.owner.login,
-                    repo: this.context.payload.repository.name,
-                    issue_number: this.context.payload.workflow_run.pull_requests[0].number,
-                    body: `CI build failed! for more information please review the [logs](${this.context.payload.workflow_run.html_url}).`
+            await this._context.octokit.issues.createComment(
+                this._context.issue({
+                    owner: this._context.payload.repository.owner.login,
+                    repo: this._context.payload.repository.name,
+                    issue_number: this._context.payload.workflow_run.pull_requests[0].number,
+                    body: `CI build failed! for more information please review the [logs](${this._context.payload.workflow_run.html_url}).`
                 })
             );
         } else {
@@ -56,48 +56,47 @@ export default class WorkflowCheck {
      */
     public async checkUserCI(): Promise<void> {
         await octokit.rest.pulls.list({
-            owner: this.context.payload.repository.owner.login,
-            repo: this.context.payload.repository.name,
-            head: `${this.context.payload.workflow_run.actor.login}:${this.context.payload.workflow_run.head_branch}`,
+            owner: this._context.payload.repository.owner.login,
+            repo: this._context.payload.repository.name,
             state: "open"
         }).then(async (res) => {
-            const prsNumber = res.data.find((a) => a.head.sha === this.context.payload.workflow_run.head_sha)?.number as number;
-            if (this.context.payload.workflow_run.conclusion === "success") {
-                await this.context.octokit.pulls.get({
-                    owner: this.context.payload.repository.owner.login,
-                    repo: this.context.payload.repository.name,
+            const prsNumber = res.data.find((a) => a.head.sha === this._context.payload.workflow_run.head_sha)?.number as number;
+            if (this._context.payload.workflow_run.conclusion === "success") {
+                console.log(this._context.payload.repository.owner.login, this._context.payload.repository.name, prsNumber);
+                await this._context.octokit.pulls.get({
+                    owner: this._context.payload.repository.owner.login,
+                    repo: this._context.payload.repository.name,
                     pull_number: prsNumber
                 }).then(async (res) => {
                     if (res.data.labels.find((a) => a.name === "CI Failed")) {
-                        await this.context.octokit.issues.removeLabel(
-                            this.context.issue({
-                                owner: this.context.payload.repository.owner.login,
-                                repo: this.context.payload.repository.name,
+                        await this._context.octokit.issues.removeLabel(
+                            this._context.issue({
+                                owner: this._context.payload.repository.owner.login,
+                                repo: this._context.payload.repository.name,
                                 issue_number: prsNumber,
                                 name: "CI Failed"
                             })
                         );
-                        console.log("CI Passed!");
                     } else {
                         return;
                     }
                 });
-            } else if (this.context.payload.workflow_run.conclusion === "failure") {
+            } else if (this._context.payload.workflow_run.conclusion === "failure") {
                 console.log("CI Failure!");
-                await this.context.octokit.issues.addLabels(
-                    this.context.issue({
-                        owner: this.context.payload.repository.owner.login,
-                        repo: this.context.payload.repository.name,
+                await this._context.octokit.issues.addLabels(
+                    this._context.issue({
+                        owner: this._context.payload.repository.owner.login,
+                        repo: this._context.payload.repository.name,
                         issue_number: prsNumber,
                         labels: ["CI Failed"]
                     })
                 );
-                await this.context.octokit.issues.createComment(
-                    this.context.issue({
-                        owner: this.context.payload.repository.owner.login,
-                        repo: this.context.payload.repository.name,
+                await this._context.octokit.issues.createComment(
+                    this._context.issue({
+                        owner: this._context.payload.repository.owner.login,
+                        repo: this._context.payload.repository.name,
                         issue_number: prsNumber,
-                        body: `CI build failed! for more information please review the [logs](${this.context.payload.workflow_run.html_url}).`
+                        body: `CI build failed! for more information please review the [logs](${this._context.payload.workflow_run.html_url}).`
                     })
                 );
             } else {
