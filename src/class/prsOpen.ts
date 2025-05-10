@@ -34,9 +34,9 @@ export default class PullRequestOpen {
             pull_number: this.context.payload.number
         }).then(async (res) => {
             const filterFiles = res.data.filter((a) => a.filename !== "package.json" && a.filename !== "package-lock.json");
-            for (let i = 0; i < filterFiles.length; i++) {
-                totalChanges += filterFiles[i].changes;
-            }
+            filterFiles.forEach((file) => {
+                totalChanges += file.changes;
+            });
 
             if (totalChanges > 1000) {
                 await this.context.octokit.issues.addLabels(
@@ -62,21 +62,19 @@ export default class PullRequestOpen {
             pull_number: this.context.payload.number
         }).then(async (res) => {
             const listFiles = res.data.map((a) => a.filename);
-            for (let i = 0; i < listFiles.length; i++) {
-                if (/src\/index/i.test(listFiles[i])) {
+            listFiles.forEach((file) => {
+                if (/src\/index/i.test(file)) {
                     fileLabels.push("Core");
-                } else if (/src\/class\/prs/i.test(listFiles[i])) {
+                } else if (/src\/class\/prs/i.test(file)) {
                     fileLabels.push("lib: Pull Request");
-                } else if (/src\/class\/issues/i.test(listFiles[i])) {
+                } else if (/src\/class\/issues/i.test(file)) {
                     fileLabels.push("lib: Issues");
-                } else if (/src\/class\/push/i.test(listFiles[i])) {
+                } else if (/src\/class\/push/i.test(file)) {
                     fileLabels.push("lib: Push");
-                } else if (/src\/class\/workflow/i.test(listFiles[i])) {
+                } else if (/src\/class\/workflow/i.test(file)) {
                     fileLabels.push("lib: Workflow");
-                } else {
-                    continue;
                 }
-            }
+            });
 
             if (fileLabels.length > 0) {
                 new Set(fileLabels).forEach((a) => filteredlabels.push(a));
