@@ -24,10 +24,12 @@
     "@octokit/auth-app": "^6.1.1",
     "@octokit/rest": "^20.1.1",
     "@types/node": "^18.19.39",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.0",
-    "typescript": "5.3.3"
+    "@stylistic/eslint-plugin-ts": "^4.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.29.1"
   },
   "engines": {
     "node": ">=18.19.0",
