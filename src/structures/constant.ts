@@ -1,12 +1,12 @@
-import IssuesClose from "../class/issuesClose";
-import IssuesComment from "../class/issuesComment";
-import IssuesOpen from "../class/issuesOpen";
-import PullRequestOpen from "../class/prsOpen";
-import PullRequestReview from "../class/prsReview";
-import PullRequestSynchronize from "../class/prsSynchronize";
-import Push from "../class/push";
-import WorkflowCheck from "../class/workflowCheck";
-import PRsStale from "../class/prsStale";
+import IssuesClose from "../class/issuesClose.js";
+import IssuesComment from "../class/issuesComment.js";
+import IssuesOpen from "../class/issuesOpen.js";
+import PullRequestOpen from "../class/prsOpen.js";
+import PullRequestReview from "../class/prsReview.js";
+import PullRequestSynchronize from "../class/prsSynchronize.js";
+import Push from "../class/push.js";
+import WorkflowCheck from "../class/workflowCheck.js";
+import PRsStale from "../class/prsStale.js";
 
 export {
     IssuesClose,

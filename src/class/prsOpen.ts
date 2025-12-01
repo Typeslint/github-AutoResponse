@@ -1,4 +1,4 @@
-import Context, { octokit } from "../index";
+import { Context, octokit } from "../index.js";
 
 /**
  * @class
@@ -11,14 +11,14 @@ export default class PullRequestOpen {
      * @private
      * @type Context<"pull_request.opened">
      */
-    private context: Context<"pull_request.opened">;
+    private _context: Context<"pull_request.opened">;
 
     /**
      * @constructor
      * @param {Context<"pull_request.opened">} context
      */
     constructor(context: Context<"pull_request.opened">) {
-        this.context = context;
+        this._context = context;
     }
 
     /**
@@ -28,10 +28,10 @@ export default class PullRequestOpen {
      */
     private async checkChanges(): Promise<void> {
         let totalChanges: number = 0;
-        await this.context.octokit.pulls.listFiles({
-            owner: this.context.payload.repository.owner.login,
-            repo: this.context.payload.repository.name,
-            pull_number: this.context.payload.number
+        await this._context.octokit.pulls.listFiles({
+            owner: this._context.payload.repository.owner.login,
+            repo: this._context.payload.repository.name,
+            pull_number: this._context.payload.number
         }).then(async (res) => {
             const filterFiles = res.data.filter((a) => a.filename !== "package.json" && a.filename !== "package-lock.json");
             filterFiles.forEach((file) => {
@@ -39,8 +39,8 @@ export default class PullRequestOpen {
             });
 
             if (totalChanges > 1000) {
-                await this.context.octokit.issues.addLabels(
-                    this.context.issue({
+                await this._context.octokit.issues.addLabels(
+                    this._context.issue({
                         labels: ["Huge Changes"]
                     })
                 );
@@ -56,10 +56,10 @@ export default class PullRequestOpen {
     private async giveLabels(): Promise<void> {
         const fileLabels: string[] = [];
         const filteredlabels: string[] = [];
-        await this.context.octokit.pulls.listFiles({
+        await this._context.octokit.pulls.listFiles({
             owner: "Typeslint",
             repo: "github-AutoResponse",
-            pull_number: this.context.payload.number
+            pull_number: this._context.payload.number
         }).then(async (res) => {
             const listFiles = res.data.map((a) => a.filename);
             listFiles.forEach((file) => {
@@ -78,8 +78,8 @@ export default class PullRequestOpen {
 
             if (fileLabels.length > 0) {
                 new Set(fileLabels).forEach((a) => filteredlabels.push(a));
-                await this.context.octokit.issues.addLabels(
-                    this.context.issue({
+                await this._context.octokit.issues.addLabels(
+                    this._context.issue({
                         labels: filteredlabels
                     })
                 );
@@ -96,26 +96,26 @@ export default class PullRequestOpen {
      */
     public async open(): Promise<void> {
 
-        if (this.context.payload.sender.login !== this.context.payload.repository.owner.login) {
-            const propened = this.context.issue({
-                body: `Hello @${this.context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+        if (this._context.payload.sender.login !== this._context.payload.repository.owner.login) {
+            const propened = this._context.issue({
+                body: `Hello @${this._context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
             });
             console.log("Pull request opened");
-            await this.context.octokit.issues.createComment(propened);
-            await this.context.octokit.issues.addLabels(
-                this.context.issue({
+            await this._context.octokit.issues.createComment(propened);
+            await this._context.octokit.issues.addLabels(
+                this._context.issue({
                     labels: ["Pending"]
                 })
             );
             await this.checkChanges();
         } else {
-            const propened = this.context.issue({
-                body: `PRs by \`[OWNER]\`${this.context.payload.pull_request.user.login}!`
+            const propened = this._context.issue({
+                body: `PRs by \`[OWNER]\`${this._context.payload.pull_request.user.login}!`
             });
             console.log("Pull request opened");
-            await this.context.octokit.issues.createComment(propened);
-            await this.context.octokit.issues.addLabels(
-                this.context.issue({
+            await this._context.octokit.issues.createComment(propened);
+            await this._context.octokit.issues.addLabels(
+                this._context.issue({
                     labels: ["Pending"]
                 })
             );
@@ -129,13 +129,13 @@ export default class PullRequestOpen {
      * @returns {Promise<void>}
      */
     public async openCore(): Promise<void> {
-        const propened = this.context.issue({
-            body: `Hello @${this.context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
+        const propened = this._context.issue({
+            body: `Hello @${this._context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
         });
         console.log("Pull request opened");
-        await this.context.octokit.issues.createComment(propened);
-        await this.context.octokit.issues.addLabels(
-            this.context.issue({
+        await this._context.octokit.issues.createComment(propened);
+        await this._context.octokit.issues.addLabels(
+            this._context.issue({
                 labels: ["Pending"]
             })
         );
@@ -145,7 +145,7 @@ export default class PullRequestOpen {
         await octokit.rest.pulls.get({
             owner: "Typeslint",
             repo: "github-AutoResponse",
-            pull_number: this.context.payload.number
+            pull_number: this._context.payload.number
         }).then(async (res) => {
             shaRef = res.data.head.sha;
             await octokit.rest.repos.getContent({
@@ -170,15 +170,15 @@ export default class PullRequestOpen {
                     if (decodeContent.includes("\"noImplicitAny\": true") && decodeContent.includes("\"noImplicitThis\": true") && decodeContent.includes("\"strictFunctionTypes\": true") && decodeContent.includes("\"strictNullChecks\": true")) {
                         return;
                     } else {
-                        await this.context.octokit.issues.addLabels(
-                            this.context.issue({
+                        await this._context.octokit.issues.addLabels(
+                            this._context.issue({
                                 labels: ["Config Invalid"]
                             })
                         );
-                        const configInvalid = this.context.issue({
+                        const configInvalid = this._context.issue({
                             body: `[tsconfig](${res.data.html_url}) needs the following rules to be set to true: ${missingRules.join(", ")}`
                         });
-                        await this.context.octokit.issues.createComment(configInvalid);
+                        await this._context.octokit.issues.createComment(configInvalid);
                     }
                 } else {
                     return;

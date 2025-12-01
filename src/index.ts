@@ -1,10 +1,10 @@
 import { Context, Probot } from "probot";
 import { Octokit } from "octokit";
 import { createAppAuth } from "@octokit/auth-app";
-import { token } from "./data/config";
-import { IssuesClose, IssuesComment, IssuesOpen, PRsStale, PullRequestOpen, PullRequestReview, PullRequestSynchronize, Push, WorkflowCheck } from "./structures/constant";
-import { GetEvent, GetUserData } from "./structures/type";
-import "./structures/listener";
+import { token } from "./data/config.js";
+import { IssuesClose, IssuesComment, IssuesOpen, PRsStale, PullRequestOpen, PullRequestReview, PullRequestSynchronize, Push, WorkflowCheck } from "./structures/constant.js";
+import { GetEvent, GetUserData } from "./structures/type.js";
+import "./structures/listener.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -19,7 +19,7 @@ const octokit = new Octokit({
     }
 });
 
-module.exports = (app: Probot) => {
+export default (app: Probot): void => {
 
     app.on("push", async (context): Promise<void> => {
         await new Push(context).push();
@@ -45,10 +45,13 @@ module.exports = (app: Probot) => {
     });
 
     app.on("issues.closed", async (context): Promise<void> => {
-        if (context.payload.issue.state_reason === "not_planned") {
-            await new IssuesClose(context).invalid();
-        } else {
-            await new IssuesClose(context).closed();
+        switch (context.payload.issue.state_reason?.toLowerCase()) {
+            case "not_planned":
+                await new IssuesClose(context).invalid();
+                break;
+            default:
+                await new IssuesClose(context).closed();
+                break;
         }
     });
 
@@ -59,8 +62,6 @@ module.exports = (app: Probot) => {
             } else {
                 await new PullRequestOpen(context).open();
             }
-        } else {
-            return;
         }
     });
 
@@ -112,6 +113,5 @@ setInterval(() => {
     });
 }, 3600000);
 
-export default Context;
-export { octokit, token };
+export { Context, octokit, token };
 export type { GetEvent, GetUserData };

@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "module": "Node16",
-    "target": "ES2023",
+    "target": "ES2024",
     "outDir": "dist",
     "lib": [
-      "ES2023",
+      "ES2024",
       "dom"
     ],
     "alwaysStrict": true,
@@ -31,7 +31,8 @@
     "strictNullChecks": true
   },
   "include": [
-    "src/"
+    "src/",
+    "eslint.config.ts"
   ],
   "exclude": [
     "node_modules"
