@@ -27,7 +27,7 @@ export default class PullRequestSynchronize {
      * @returns {Promise<void>}
      */
     public async sync(): Promise<void> {
-        await this._context.octokit.issues.listLabelsOnIssue({
+        await this._context.octokit.rest.issues.listLabelsOnIssue({
             owner: this._context.payload.repository.owner.login,
             repo: this._context.payload.repository.name,
             issue_number: this._context.payload.pull_request.number
@@ -35,7 +35,7 @@ export default class PullRequestSynchronize {
             let i: number;
             const prsLabels = res.data.find((a) => a.name === "Requested Changes" || a.name === "Approved")?.name;
             if (prsLabels) {
-                await this._context.octokit.pulls.listReviews({
+                await this._context.octokit.rest.pulls.listReviews({
                     owner: this._context.payload.repository.owner.login,
                     repo: this._context.payload.repository.name,
                     pull_number: this._context.payload.pull_request.number
@@ -53,14 +53,14 @@ export default class PullRequestSynchronize {
                                     const username: string = res.data[i].user?.login || "";
                                     reviewersArray.push(username);
                                     tagReviewers.push("@" + username);
-                                    await this._context.octokit.pulls.dismissReview({
+                                    await this._context.octokit.rest.pulls.dismissReview({
                                         owner: this._context.payload.repository.owner.login,
                                         repo: this._context.payload.repository.name,
                                         pull_number: this._context.payload.pull_request.number,
                                         review_id: res.data[i].id,
                                         message: "This review is stale and has been dismissed."
                                     });
-                                    await this._context.octokit.pulls.requestReviewers({
+                                    await this._context.octokit.rest.pulls.requestReviewers({
                                         owner: this._context.payload.repository.owner.login,
                                         repo: this._context.payload.repository.name,
                                         pull_number: this._context.payload.pull_request.number,
@@ -76,8 +76,8 @@ export default class PullRequestSynchronize {
                             continue;
                         }
                     }
-                    if (this._context.payload.sender.login === this._context.payload.pull_request.user.login) {
-                        await this._context.octokit.issues.createComment(
+                    if (this._context.payload.sender.login === this._context.payload.pull_request.user?.login) {
+                        await this._context.octokit.rest.issues.createComment(
                             this._context.issue({
                                 owner: this._context.payload.repository.owner.login,
                                 repo: this._context.payload.repository.name,
@@ -85,13 +85,13 @@ export default class PullRequestSynchronize {
                                 body: `PING! ${tagReviewers.join(", ")}. The author has pushed new commits since your last review. please review @${this._context.payload.sender.login} new commit before merge, thanks!`
                             })
                         );
-                        await this._context.octokit.issues.removeLabel(
+                        await this._context.octokit.rest.issues.removeLabel(
                             this._context.issue({
                                 name: prsLabels
                             })
                         );
                     } else {
-                        await this._context.octokit.issues.removeLabel(
+                        await this._context.octokit.rest.issues.removeLabel(
                             this._context.issue({
                                 name: prsLabels
                             })
@@ -128,13 +128,13 @@ export default class PullRequestSynchronize {
                     const textContent:string = res.data.content;
                     const decodeContent:string = Buffer.from(textContent, "base64").toString("utf-8");
                     if (decodeContent.includes("\"noImplicitAny\": true") && decodeContent.includes("\"noImplicitThis\": true") && decodeContent.includes("\"strictFunctionTypes\": true") && decodeContent.includes("\"strictNullChecks\": true")) {
-                        await this._context.octokit.issues.listLabelsOnIssue({
+                        await this._context.octokit.rest.issues.listLabelsOnIssue({
                             owner: this._context.payload.repository.owner.login,
                             repo: this._context.payload.repository.name,
                             issue_number: this._context.payload.pull_request.number
                         }).then(async (res) => {
                             if (res.data.find((a) => a.name === "Config Invalid")) {
-                                await this._context.octokit.issues.removeLabel(
+                                await this._context.octokit.rest.issues.removeLabel(
                                     this._context.issue({
                                         name: "Config Invalid"
                                     })
@@ -147,7 +147,7 @@ export default class PullRequestSynchronize {
                         const configInvalid = this._context.issue({
                             body: `[tsconfig](${res.data.html_url}) need [*noImplicitAny*, *noImplicitThis*, *strictFunctionTypes*, *strictNullChecks*] to true value`
                         });
-                        await this._context.octokit.issues.createComment(configInvalid);
+                        await this._context.octokit.rest.issues.createComment(configInvalid);
                     }
                 } else {
                     return;

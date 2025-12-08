@@ -31,13 +31,13 @@ export default class IssuesClose {
             body: `Issue closed by @${this._context.payload.sender.login}.`
         });
         console.log("Issues closed");
-        await this._context.octokit.issues.addLabels(
+        await this._context.octokit.rest.issues.addLabels(
             this._context.issue({
                 labels: ["Closed"]
             })
         );
-        await this._context.octokit.issues.createComment(issueClosed);
-        await this._context.octokit.issues.removeLabel(
+        await this._context.octokit.rest.issues.createComment(issueClosed);
+        await this._context.octokit.rest.issues.removeLabel(
             this._context.issue({
                 name: "Pending"
             })
@@ -54,18 +54,18 @@ export default class IssuesClose {
             body: `Issue closed as invalid by @${this._context.payload.sender.login}.`
         });
         console.log("Issues closed");
-        await this._context.octokit.issues.addLabels(
+        await this._context.octokit.rest.issues.addLabels(
             this._context.issue({
                 labels: ["Closed", "Invalid"]
             })
         );
-        await this._context.octokit.issues.createComment(issueClosed);
-        await this._context.octokit.issues.removeLabel(
+        await this._context.octokit.rest.issues.createComment(issueClosed);
+        await this._context.octokit.rest.issues.removeLabel(
             this._context.issue({
                 name: "Pending"
             })
         );
-        await this._context.octokit.issues.lock({
+        await this._context.octokit.rest.issues.lock({
             owner: this._context.payload.repository.owner.login,
             repo: this._context.payload.repository.name,
             issue_number: this._context.payload.issue.number,

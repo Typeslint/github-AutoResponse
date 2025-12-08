@@ -32,12 +32,12 @@ export default class IssuesOpen {
                 body: `Hello @${this._context.payload.sender.login} Thank you for submitting Issue, please wait for next notification after we review your Issue.`
             });
             console.log("Issues created");
-            await this._context.octokit.issues.addLabels(
+            await this._context.octokit.rest.issues.addLabels(
                 this._context.issue({
                     labels: ["Pending"]
                 })
             );
-            await this._context.octokit.issues.createComment(issueComment);
+            await this._context.octokit.rest.issues.createComment(issueComment);
         } else {
             return;
         }

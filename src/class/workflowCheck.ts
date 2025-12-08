@@ -28,19 +28,19 @@ export default class WorkflowCheck {
      */
     public async checkCI(): Promise<void> {
         if (this._context.payload.workflow_run.conclusion === "failure") {
-            await this._context.octokit.issues.addLabels(
+            await this._context.octokit.rest.issues.addLabels(
                 this._context.issue({
                     owner: this._context.payload.repository.owner.login,
                     repo: this._context.payload.repository.name,
-                    issue_number: this._context.payload.workflow_run.pull_requests[0].number,
+                    issue_number: this._context.payload.workflow_run.pull_requests[0]?.number,
                     labels: ["CI Failed"]
                 })
             );
-            await this._context.octokit.issues.createComment(
+            await this._context.octokit.rest.issues.createComment(
                 this._context.issue({
                     owner: this._context.payload.repository.owner.login,
                     repo: this._context.payload.repository.name,
-                    issue_number: this._context.payload.workflow_run.pull_requests[0].number,
+                    issue_number: this._context.payload.workflow_run.pull_requests[0]?.number,
                     body: `CI build failed! for more information please review the [logs](${this._context.payload.workflow_run.html_url}).`
                 })
             );
@@ -63,13 +63,13 @@ export default class WorkflowCheck {
             const prsNumber = res.data.find((a) => a.head.sha === this._context.payload.workflow_run.head_sha)?.number as number;
             if (this._context.payload.workflow_run.conclusion === "success") {
                 console.log(this._context.payload.repository.owner.login, this._context.payload.repository.name, prsNumber);
-                await this._context.octokit.pulls.get({
+                await this._context.octokit.rest.pulls.get({
                     owner: this._context.payload.repository.owner.login,
                     repo: this._context.payload.repository.name,
                     pull_number: prsNumber
                 }).then(async (res) => {
                     if (res.data.labels.find((a) => a.name === "CI Failed")) {
-                        await this._context.octokit.issues.removeLabel(
+                        await this._context.octokit.rest.issues.removeLabel(
                             this._context.issue({
                                 owner: this._context.payload.repository.owner.login,
                                 repo: this._context.payload.repository.name,
@@ -83,7 +83,7 @@ export default class WorkflowCheck {
                 });
             } else if (this._context.payload.workflow_run.conclusion === "failure") {
                 console.log("CI Failure!");
-                await this._context.octokit.issues.addLabels(
+                await this._context.octokit.rest.issues.addLabels(
                     this._context.issue({
                         owner: this._context.payload.repository.owner.login,
                         repo: this._context.payload.repository.name,
@@ -91,7 +91,7 @@ export default class WorkflowCheck {
                         labels: ["CI Failed"]
                     })
                 );
-                await this._context.octokit.issues.createComment(
+                await this._context.octokit.rest.issues.createComment(
                     this._context.issue({
                         owner: this._context.payload.repository.owner.login,
                         repo: this._context.payload.repository.name,

@@ -15,7 +15,7 @@ const octokit = new Octokit({
         privateKey: process.env.PRIVATE_KEY,
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        installationId: 12345678 // env not working
+        installationId: process.env.INSTALLATION_ID
     }
 });
 
@@ -30,7 +30,7 @@ export default (app: Probot): void => {
     });
 
     app.on("issue_comment.created", async (context): Promise<void> => {
-        if (context.payload.comment.user.type === "User") {
+        if (context.payload.comment.user?.type === "User") {
             switch (context.payload.issue.user.type) {
                 case "User":
                     await new IssuesComment(context).userPRsComment();
@@ -67,7 +67,7 @@ export default (app: Probot): void => {
 
     app.on("pull_request_review.submitted", async (context): Promise<void> => {
         if (context.payload.sender.type === "User") {
-            switch (context.payload.pull_request.user.type) {
+            switch (context.payload.pull_request.user?.type) {
                 case "User":
                     await new PullRequestReview(context).userPRs();
                     break;
@@ -81,7 +81,7 @@ export default (app: Probot): void => {
     });
 
     app.on("pull_request.synchronize", async (context): Promise<void> => {
-        if (context.payload.pull_request.user.type === "User") {
+        if (context.payload.pull_request.user?.type === "User") {
             if (context.payload.repository.homepage === "https://github.com/Typeslint/github-AutoResponse") {
                 await new PullRequestSynchronize(context).synchronizeCore();
             }
