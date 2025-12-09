@@ -24,18 +24,16 @@
     "smee-client": "^5.0.0"
   },
   "devDependencies": {
-    "@octokit/auth-app": "^6.1.1",
-    "@octokit/rest": "^20.1.1",
     "@stylistic/eslint-plugin": "^5.6.1",
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.2",
     "eslint": "^9.39.1",
     "jiti": "^2.6.1",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.48.1"
+    "typescript-eslint": "^8.49.0"
   },
   "engines": {
-    "node": ">=18.19.0",
-    "npm": ">=10.2.3"
+    "node": ">=22.21.1",
+    "npm": ">=10.9.4"
   },
   "repository": {
     "type": "git",
