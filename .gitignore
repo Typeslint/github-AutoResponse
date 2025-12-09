@@ -6,3 +6,6 @@ npm-debug.log
 coverage
 lib
 dist
+.vscode
+package-lock.json
+.cache
