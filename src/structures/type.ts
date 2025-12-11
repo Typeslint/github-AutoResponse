@@ -1,10 +1,10 @@
 export type GetUserData = {
     userData: UserDataInterface[];
-}
+};
 
 type UserDataInterface = {
     event: string;
-}
+};
 
 export type GetEvent = {
     id: string;
@@ -56,4 +56,4 @@ export type GetEvent = {
         public: boolean;
         created_at: string;
     };
-}
+};

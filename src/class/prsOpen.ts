@@ -28,7 +28,7 @@ export default class PullRequestOpen {
      */
     private async checkChanges(): Promise<void> {
         let totalChanges: number = 0;
-        await this._context.octokit.pulls.listFiles({
+        await this._context.octokit.rest.pulls.listFiles({
             owner: this._context.payload.repository.owner.login,
             repo: this._context.payload.repository.name,
             pull_number: this._context.payload.number
@@ -39,7 +39,7 @@ export default class PullRequestOpen {
             });
 
             if (totalChanges > 1000) {
-                await this._context.octokit.issues.addLabels(
+                await this._context.octokit.rest.issues.addLabels(
                     this._context.issue({
                         labels: ["Huge Changes"]
                     })
@@ -56,7 +56,7 @@ export default class PullRequestOpen {
     private async giveLabels(): Promise<void> {
         const fileLabels: string[] = [];
         const filteredlabels: string[] = [];
-        await this._context.octokit.pulls.listFiles({
+        await this._context.octokit.rest.pulls.listFiles({
             owner: "Typeslint",
             repo: "github-AutoResponse",
             pull_number: this._context.payload.number
@@ -78,7 +78,7 @@ export default class PullRequestOpen {
 
             if (fileLabels.length > 0) {
                 new Set(fileLabels).forEach((a) => filteredlabels.push(a));
-                await this._context.octokit.issues.addLabels(
+                await this._context.octokit.rest.issues.addLabels(
                     this._context.issue({
                         labels: filteredlabels
                     })
@@ -101,8 +101,8 @@ export default class PullRequestOpen {
                 body: `Hello @${this._context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
             });
             console.log("Pull request opened");
-            await this._context.octokit.issues.createComment(propened);
-            await this._context.octokit.issues.addLabels(
+            await this._context.octokit.rest.issues.createComment(propened);
+            await this._context.octokit.rest.issues.addLabels(
                 this._context.issue({
                     labels: ["Pending"]
                 })
@@ -113,8 +113,8 @@ export default class PullRequestOpen {
                 body: `PRs by \`[OWNER]\`${this._context.payload.pull_request.user.login}!`
             });
             console.log("Pull request opened");
-            await this._context.octokit.issues.createComment(propened);
-            await this._context.octokit.issues.addLabels(
+            await this._context.octokit.rest.issues.createComment(propened);
+            await this._context.octokit.rest.issues.addLabels(
                 this._context.issue({
                     labels: ["Pending"]
                 })
@@ -133,8 +133,8 @@ export default class PullRequestOpen {
             body: `Hello @${this._context.payload.sender.login} Thank you for submitting Pull Request, please wait for next notification after we review your Pull Request`
         });
         console.log("Pull request opened");
-        await this._context.octokit.issues.createComment(propened);
-        await this._context.octokit.issues.addLabels(
+        await this._context.octokit.rest.issues.createComment(propened);
+        await this._context.octokit.rest.issues.addLabels(
             this._context.issue({
                 labels: ["Pending"]
             })
@@ -170,7 +170,7 @@ export default class PullRequestOpen {
                     if (decodeContent.includes("\"noImplicitAny\": true") && decodeContent.includes("\"noImplicitThis\": true") && decodeContent.includes("\"strictFunctionTypes\": true") && decodeContent.includes("\"strictNullChecks\": true")) {
                         return;
                     } else {
-                        await this._context.octokit.issues.addLabels(
+                        await this._context.octokit.rest.issues.addLabels(
                             this._context.issue({
                                 labels: ["Config Invalid"]
                             })
@@ -178,7 +178,7 @@ export default class PullRequestOpen {
                         const configInvalid = this._context.issue({
                             body: `[tsconfig](${res.data.html_url}) needs the following rules to be set to true: ${missingRules.join(", ")}`
                         });
-                        await this._context.octokit.issues.createComment(configInvalid);
+                        await this._context.octokit.rest.issues.createComment(configInvalid);
                     }
                 } else {
                     return;

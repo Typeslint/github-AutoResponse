@@ -82,18 +82,18 @@ export default class Push {
                 return;
             });
         }
-        if (this._context.payload.repository.owner.login === "Muunatic") {
-            if (this._context.payload.sender.login === "Muunatic") {
+        if (this._context.payload.repository.owner?.login === "Muunatic") {
+            if (this._context.payload.sender?.login === "Muunatic") {
                 await userActivity();
-                await this._context.octokit.repos.getContent({
+                await this._context.octokit.rest.repos.getContent({
                     owner: "Muunatic",
                     repo: "Muunatic",
                     path: "README.md",
                     ref: "main"
                 }).then(async (res) => {
                     if ("sha" in res.data) {
-                        const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://github-readme-stats-rongronggg9.vercel.app/api?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
-                        await this._context.octokit.repos.createOrUpdateFileContents({
+                        const textcontent = `# ɢɪᴛʜᴜʙ sᴛᴀᴛs  <p align="left"> <a href="https://readme.muunatic.dev/?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"><img src="https://readme.muunatic.dev/?username=Muunatic&show_icons=true&count_private=true&include_all_commits=true&theme=tokyonight&custom_title=Muunatic%20GitHub%20Stats&hide_border=true"> </p> <p align="left"> <a href="https://readme.muunatic.dev/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"><img src="https://readme.muunatic.dev/top-langs?username=Muunatic&layout=compact&langs_count=10&theme=tokyonight&hide_border=true"> </p> \nUpdated ${new Date().toUTCString()} \n\n1. ${event1}\n2. ${event2}\n3. ${event3}\n4. ${event4}\n5. ${event5}`;
+                        await this._context.octokit.rest.repos.createOrUpdateFileContents({
                             content: Buffer.from(textcontent, "utf-8").toString("base64"),
                             path: "README.md",
                             message: "Update Readme.md",
@@ -106,7 +106,7 @@ export default class Push {
                         return;
                     }
                 });
-            } else if (this._context.payload.sender.login === "typeslint-cli[bot]") {
+            } else if (this._context.payload.sender?.login === "typeslint-cli[bot]") {
                 if (this._context.payload.repository.name === "Muunatic") {
                     await octokit.rest.checks.create({
                         owner: "Muunatic",
@@ -124,7 +124,7 @@ export default class Push {
                             conclusion: "success",
                             output: {
                                 title: "Update Activities ✔️",
-                                summary: "@" + this._context.payload.sender.login + " README Update"
+                                summary: "@" + this._context.payload.sender?.login + " README Update"
                             }
                         });
                     });
