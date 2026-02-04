@@ -1,4 +1,4 @@
-import { octokit } from "../index";
+import { octokit } from "../index.js";
 
 /**
  * @class

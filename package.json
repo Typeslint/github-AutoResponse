@@ -1,37 +1,39 @@
 {
   "name": "typeslint-cli",
-  "version": "3.0.1",
+  "version": "4.0.0",
+  "type": "module",
   "private": true,
   "description": "GitHub Workflow Apps",
   "homepage": "https://typeslint.com/github-autoresponse",
   "author": "Typeslint",
   "license": "ISC",
   "scripts": {
-    "build": "tsc --build --verbose",
-    "build:start": "tsc --build --verbose && probot run ./dist/index.js",
-    "start": "probot run ./dist/index.js",
+    "build": "tsc --build --clean && tsc --build --force --verbose",
+    "build:start": "tsc --build --clean && tsc --build --force --verbose && probot run ./dist/src/index.js",
+    "start": "probot run ./dist/src/index.js",
     "test": "eslint .",
     "lint": "npx eslint src/**/*.ts",
     "lint:fix": "npx eslint src/**/*.ts --fix"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "octokit": "^3.2.1",
-    "probot": "^12.4.0",
-    "smee-client": "^2.0.1"
+    "@octokit/auth-app": "^8.1.2",
+    "@octokit/rest": "^22.0.1",
+    "dotenv": "^16.6.1",
+    "octokit": "^5.0.5",
+    "probot": "^14.2.4",
+    "smee-client": "^5.0.0"
   },
   "devDependencies": {
-    "@octokit/auth-app": "^6.1.1",
-    "@octokit/rest": "^20.1.1",
-    "@types/node": "^18.19.39",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.0",
-    "typescript": "5.3.3"
+    "@stylistic/eslint-plugin": "^5.6.1",
+    "@types/node": "^22.19.2",
+    "eslint": "^9.39.1",
+    "jiti": "^2.6.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.49.0"
   },
   "engines": {
-    "node": ">=18.19.0",
-    "npm": ">=10.2.3"
+    "node": ">=22.21.1",
+    "npm": ">=10.9.4"
   },
   "repository": {
     "type": "git",

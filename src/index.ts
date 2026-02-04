@@ -1,10 +1,10 @@
 import { Context, Probot } from "probot";
 import { Octokit } from "octokit";
 import { createAppAuth } from "@octokit/auth-app";
-import { token } from "./data/config";
-import { IssuesClose, IssuesComment, IssuesOpen, PRsStale, PullRequestOpen, PullRequestReview, PullRequestSynchronize, Push, WorkflowCheck } from "./structures/constant";
-import { getEvent, getUserData } from "./structures/type";
-import "./structures/listener";
+import { token } from "./data/config.js";
+import { IssuesClose, IssuesComment, IssuesOpen, PRsStale, PullRequestOpen, PullRequestReview, PullRequestSynchronize, Push, WorkflowCheck } from "./structures/constant.js";
+import { GetEvent, GetUserData } from "./structures/type.js";
+import "./structures/listener.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -15,11 +15,11 @@ const octokit = new Octokit({
         privateKey: process.env.PRIVATE_KEY,
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        installationId: 12345678 // env not working
+        installationId: process.env.INSTALLATION_ID
     }
 });
 
-module.exports = (app: Probot) => {
+export default (app: Probot): void => {
 
     app.on("push", async (context): Promise<void> => {
         await new Push(context).push();
@@ -30,7 +30,7 @@ module.exports = (app: Probot) => {
     });
 
     app.on("issue_comment.created", async (context): Promise<void> => {
-        if (context.payload.comment.user.type === "User") {
+        if (context.payload.comment.user?.type === "User") {
             switch (context.payload.issue.user.type) {
                 case "User":
                     await new IssuesComment(context).userPRsComment();
@@ -45,10 +45,13 @@ module.exports = (app: Probot) => {
     });
 
     app.on("issues.closed", async (context): Promise<void> => {
-        if (context.payload.issue.state_reason === "not_planned") {
-            await new IssuesClose(context).invalid();
-        } else {
-            await new IssuesClose(context).closed();
+        switch (context.payload.issue.state_reason?.toLowerCase()) {
+            case "not_planned":
+                await new IssuesClose(context).invalid();
+                break;
+            default:
+                await new IssuesClose(context).closed();
+                break;
         }
     });
 
@@ -59,14 +62,12 @@ module.exports = (app: Probot) => {
             } else {
                 await new PullRequestOpen(context).open();
             }
-        } else {
-            return;
         }
     });
 
     app.on("pull_request_review.submitted", async (context): Promise<void> => {
         if (context.payload.sender.type === "User") {
-            switch (context.payload.pull_request.user.type) {
+            switch (context.payload.pull_request.user?.type) {
                 case "User":
                     await new PullRequestReview(context).userPRs();
                     break;
@@ -80,7 +81,7 @@ module.exports = (app: Probot) => {
     });
 
     app.on("pull_request.synchronize", async (context): Promise<void> => {
-        if (context.payload.pull_request.user.type === "User") {
+        if (context.payload.pull_request.user?.type === "User") {
             if (context.payload.repository.homepage === "https://github.com/Typeslint/github-AutoResponse") {
                 await new PullRequestSynchronize(context).synchronizeCore();
             }
@@ -112,6 +113,5 @@ setInterval(() => {
     });
 }, 3600000);
 
-export default Context;
-export { octokit, token };
-export type { getEvent, getUserData };
+export { Context, octokit, token };
+export type { GetEvent, GetUserData };

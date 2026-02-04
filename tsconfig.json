@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES2021",
+    "module": "Node16",
+    "target": "ES2024",
     "outDir": "dist",
     "lib": [
-      "ES2021",
+      "ES2024",
       "dom"
     ],
     "alwaysStrict": true,
@@ -14,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "noEmitOnError": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,
@@ -31,7 +31,8 @@
     "strictNullChecks": true
   },
   "include": [
-    "src/"
+    "src/",
+    "eslint.config.ts"
   ],
   "exclude": [
     "node_modules"

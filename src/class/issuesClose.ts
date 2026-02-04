@@ -1,4 +1,4 @@
-import Context from "../index";
+import { Context } from "../index.js";
 
 /**
  * @class
@@ -11,14 +11,14 @@ export default class IssuesClose {
      * @private
      * @type Context<"issues.closed">
      */
-    private context: Context<"issues.closed">;
+    private _context: Context<"issues.closed">;
 
     /**
      * @constructor
      * @param {Context<"issues.closed">} context
      */
     constructor(context: Context<"issues.closed">) {
-        this.context = context;
+        this._context = context;
     }
 
     /**
@@ -27,18 +27,18 @@ export default class IssuesClose {
      * @returns {Promise<void>}
      */
     public async closed(): Promise<void> {
-        const issueClosed = this.context.issue({
-            body: `Issue closed by @${this.context.payload.sender.login}.`
+        const issueClosed = this._context.issue({
+            body: `Issue closed by @${this._context.payload.sender.login}.`
         });
         console.log("Issues closed");
-        await this.context.octokit.issues.addLabels(
-            this.context.issue({
+        await this._context.octokit.rest.issues.addLabels(
+            this._context.issue({
                 labels: ["Closed"]
             })
         );
-        await this.context.octokit.issues.createComment(issueClosed);
-        await this.context.octokit.issues.removeLabel(
-            this.context.issue({
+        await this._context.octokit.rest.issues.createComment(issueClosed);
+        await this._context.octokit.rest.issues.removeLabel(
+            this._context.issue({
                 name: "Pending"
             })
         );
@@ -50,25 +50,25 @@ export default class IssuesClose {
      * @returns {Promise<void>}
      */
     public async invalid(): Promise<void> {
-        const issueClosed = this.context.issue({
-            body: `Issue closed as invalid by @${this.context.payload.sender.login}.`
+        const issueClosed = this._context.issue({
+            body: `Issue closed as invalid by @${this._context.payload.sender.login}.`
         });
         console.log("Issues closed");
-        await this.context.octokit.issues.addLabels(
-            this.context.issue({
+        await this._context.octokit.rest.issues.addLabels(
+            this._context.issue({
                 labels: ["Closed", "Invalid"]
             })
         );
-        await this.context.octokit.issues.createComment(issueClosed);
-        await this.context.octokit.issues.removeLabel(
-            this.context.issue({
+        await this._context.octokit.rest.issues.createComment(issueClosed);
+        await this._context.octokit.rest.issues.removeLabel(
+            this._context.issue({
                 name: "Pending"
             })
         );
-        await this.context.octokit.issues.lock({
-            owner: this.context.payload.repository.owner.login,
-            repo: this.context.payload.repository.name,
-            issue_number: this.context.payload.issue.number,
+        await this._context.octokit.rest.issues.lock({
+            owner: this._context.payload.repository.owner.login,
+            repo: this._context.payload.repository.name,
+            issue_number: this._context.payload.issue.number,
             lock_reason: "off-topic"
         });
     }
