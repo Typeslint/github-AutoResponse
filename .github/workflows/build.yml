@@ -8,10 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [20.19.0]
+        node-version: [22.21.1]
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -19,7 +19,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install npm
-      run: npm install npm@10.8.2 -g
+      run: npm install npm@10.9.4 -g
     - name: Install dependencies
       run: npm i
     - name: Run typescript compiler
